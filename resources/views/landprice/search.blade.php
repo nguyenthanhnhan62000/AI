@@ -13,14 +13,16 @@
 
 <body>
     <div class="container mt-4">
-        <div class="row">
-            <div class="col-md-3">
-                Chọn Địa Bàn
-            </div>
-            <div class="col-md-3">
-                <div class="form-group">
-                    <select class="form-control stTT" name="slTT" id="">
-                        {{-- <option value=''>Chọn Tỉnh Thành</option> --}}
+        <form action="" method="post">
+
+            <div class="row">
+                <div class="col-md-3">
+                    Chọn Địa Bàn
+                </div>
+                <div class="col-md-3">
+                    <div class="form-group">
+                        <select class="form-control stTT" name="slTT" id="">
+                            {{-- <option value=''>Chọn Tỉnh Thành</option> --}}
                     </select>
                 </div>
             </div>
@@ -50,8 +52,14 @@
                     </select>
                 </div>
             </div>
+            <div class="col-md-3">
+                <div class="form-group">
+                    <button type="submit" class="btn btn-primary">Xem Gia</button>
+                </div>
+            </div>
         </div>
     </div>
+</form>
 
     <!-- Optional JavaScript -->
     <!-- jQuery first, then Popper.js, then Bootstrap JS -->
