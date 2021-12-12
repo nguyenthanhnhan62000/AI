@@ -16,4 +16,4 @@ use App\Http\Controllers\LandPriceController;
 
 Route::get('/search',  [LandPriceController::class, 'search'])->name('search');
 
-Route::get('/search_post', [LandPriceController::class, 'search_post'])->name('search_post');
+Route::post('/search_post', [LandPriceController::class, 'search_post'])->name('search_post');
