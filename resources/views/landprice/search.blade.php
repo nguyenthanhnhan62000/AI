@@ -23,43 +23,79 @@
                     <div class="form-group">
                         <select class="form-control stTT" name="slTT" id="">
                             {{-- <option value=''>Chọn Tỉnh Thành</option> --}}
-                    </select>
+                        </select>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="form-group">
+                        <select class="form-control stQH" name="slQH" id="">
+                            <option value=''>Chọn Quận Huyện...</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="form-group">
+                        <select class="form-control slTD" name="slTD" id="">
+                            <option value=''>Chọn Tên Đường</option>
+                        </select>
+                    </div>
                 </div>
             </div>
-            <div class="col-md-3">
-                <div class="form-group">
-                    <select class="form-control stQH" name="slQH" id="">
-                        <option value=''>Chọn Quận Huyện...</option>
-                    </select>
+            <div class="row">
+                <div class="col-md-3">
+                    Mức giá
+                </div>
+                <div class="col-md-3">
+                    <div class="form-group">
+                        <select class="form-control slMG" name="slMG" id="">
+                            <option value=''>Tất Cả</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="form-group">
+                        <button type="submit" class="btn btn-primary">Xem Gia</button>
+                    </div>
                 </div>
             </div>
-            <div class="col-md-3">
-                <div class="form-group">
-                    <select class="form-control slTD" name="slTD" id="">
-                        <option value=''>Chọn Tên Đường</option>
-                    </select>
-                </div>
-            </div>
-        </div>
-        <div class="row">
-            <div class="col-md-3">
-                Mức giá
-            </div>
-            <div class="col-md-3">
-                <div class="form-group">
-                    <select class="form-control slMG" name="slMG" id="">
-                        <option value=''>Tất Cả</option>
-                    </select>
-                </div>
-            </div>
-            <div class="col-md-3">
-                <div class="form-group">
-                    <button type="submit" class="btn btn-primary">Xem Gia</button>
-                </div>
-            </div>
-        </div>
+        </form>
     </div>
-</form>
+    <div class="container">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>STT</th>
+                    <th>Quận/Huyện</th>
+                    <th>Tên đường/Làng xã</th>
+                    <th>Đoạn: Từ - Đến</th>
+                    <th>VTV1</th>
+                    <th>VTV2</th>
+                    <th>VTV3</th>
+                    <th>VTV4</th>
+                    <th>VTV5</th>
+                    <th>Loại</th>
+                </tr>
+            </thead>
+            <tbody>
+                @for ($i = 1; $i < count($data); $i++)
+                    <tr>
+                        <td>{{ $data[$i][0] }}</td>
+                        <td>{{ $data[$i][1] }}</td>
+                        <td>{{ $data[$i][2] }}</td>
+                        <td>{{ $data[$i][3] }}</td>
+                        <td>{{ $data[$i][4] }}</td>
+                        <td>{{ $data[$i][5] }}</td>
+                        <td>{{ $data[$i][6] }}</td>
+                        <td>{{ $data[$i][7] }}</td>          
+                        <td>{{ $data[$i][8] }}</td>          
+                        <td>{{ $data[$i][9] }}</td>          
+                    </tr>
+
+                @endfor
+            </tbody>
+        </table>
+    </div>
+
 
     <!-- Optional JavaScript -->
     <!-- jQuery first, then Popper.js, then Bootstrap JS -->
