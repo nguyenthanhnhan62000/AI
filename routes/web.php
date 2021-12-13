@@ -24,4 +24,4 @@ Route::post('/law/post_search', [LawController::class, 'post_search']);
 
 Route::get('law/content/crawl_content', [LawController::class, 'crawl_content']);
 
-Route::get('law/post/index', [LawController::class, 'post_index']);
+Route::post('law/post/index', [LawController::class, 'post_index']);

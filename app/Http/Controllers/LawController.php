@@ -17,19 +17,44 @@ class LawController extends Controller
     public $results = [];
     public $chapter = '';
     public $child = '';
-
+    public $index;
     public function index()
     {
         $laws = Law::all();
         return view('law.index', compact('laws'));
     }
-    public function post_index(){
+    public function post_index(Request $request){
         $client = new Client();
-        $url = 'https://thuvienphapluat.vn/phap-luat/tim-van-ban.aspx?keyword=lu%E1%BA%ADt%20%C4%91%E1%BA%A5t%20%C4%91ai&area=0&type=0&status=0&lan=1&org=0&signer=0&match=True&sort=1&bdate=13/12/1941&edate=14/12/2021';
+        $url = 'https://thuvienphapluat.vn/phap-luat/tim-van-ban.aspx?keyword='.$request->textSearch.'&area=0&type=0&status=0&lan=1&org=0&signer=0&match=True&sort=1&bdate=13/12/1941&edate=14/12/2021&page='.$request->page;
         $page = $client->request('GET', $url);
-        $content = $page->filter('.content-0')->each(function($item){
-            echo $item->filter('a')->attr('href');
+        $page->filter('.content-0')->each(function($item){
+            $this->index = $item->filter('.number')->text();
+            $href = $item->filter('a')->attr('href');
+            $href_new = str_replace("https://thuvienphapluat.vn/","",$href);
+            $this->results[$this->index][] = $item->filter('a')->html();
+            $this->results[$this->index][] = $href_new;
+            $this->results[$this->index][] = $item->filter('.nqContent')->html();
+            $item->filter('.right-col')->each(function($it){
+                $it->filter('p')->each(function ($i){
+                    $this->results[$this->index][] = $i->text();
+                });
+            });
         });
+        $page->filter('.content-1')->each(function($item){
+            $this->index = $item->filter('.number')->text();
+            $href = $item->filter('a')->attr('href');
+            $href_new = str_replace("https://thuvienphapluat.vn/","",$href);
+            $this->results[$this->index][] = $item->filter('a')->html();
+            $this->results[$this->index][] = $href_new;
+            $this->results[$this->index][] = $item->filter('.nqContent')->html();
+            $item->filter('.right-col')->each(function($it){
+                $it->filter('p')->each(function ($i){
+                    $this->results[$this->index][] = $i->text();
+                });
+            });
+        });
+        $data = $this->results;
+        return response()->json(['data'=> $data]);
     }
 
     public function crawl_content()

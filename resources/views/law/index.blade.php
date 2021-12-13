@@ -6,10 +6,16 @@
     <!-- Required meta tags -->
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     <!-- Bootstrap CSS -->
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
         integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+    <style>
+        em {
+            background: yellow;
+        }
+
+    </style>
 </head>
 
 <body>
@@ -41,14 +47,20 @@
         <div class="row">
             <div class="col-md-9">
                 <div class="form-group">
-                    <input type="text" name="searchLaw" placeholder="<Tìm Kiếm Văn Bản Pháp Luật>" class="form-control">
+                    <input value="Luật đất đai" type="text" placeholder="<Tìm Kiếm Văn Bản Pháp Luật>"
+                        class="form-control searchLaw">
                 </div>
             </div>
             <div class="col-md-3">
                 <div class="form-group">
-                    <button type="submit" class="btn btn-success btnSearchLaw" >Tìm Kiếm</button>
+                    <button type="submit" class="btn btn-success btnSearchLaw">Tìm Kiếm</button>
                 </div>
             </div>
+        </div>
+    </div>
+    <div class="container showData">
+        <div class="row">
+
         </div>
     </div>
     <!-- Optional JavaScript -->
@@ -62,11 +74,58 @@
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"
         integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous">
     </script>
-    <script src="https://cdn.ckeditor.com/4.17.1/standard/ckeditor.js"></script>
     <script>
         let searchLaw = $('.searchLaw');
         let btnSearchLaw = $('.btnSearchLaw');
+        let showData = $('.showData');
 
+        btnSearchLaw.click(function() {
+            let data = {
+                'textSearch': searchLaw.val(),
+                'page': 1
+            }
+            let html = ''
+            fetchData('/law/post/index', data).then(function(result) {
+                data = result.data;
+                console.log(data);
+                for (let key in data) {
+                    html += `
+                            <div class="row">
+                                <div class="col-md-1">${key}</div>
+                                <div class="col-md-7">
+                                    <p><b>${data[key][0]}</b></p>
+                                    <p>${data[key][2]}</p>
+                                </div>
+                                <div class="col-md-4">
+                                    <div>${data[key][3]}</div>
+                                    <div>${data[key][4]}</div>
+                                    <div>${data[key][5]}</div>
+                                    <div>${data[key][6]}</div>
+                                </div>
+                            </div>       
+                    `
+                }
+                showData.html(html)
+            })
+        });
+        async function fetchData(url, data) {
+            let token = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+            return fetch(url, {
+                    headers: {
+                        "Content-Type": "application/json",
+                        "Accept": "application/json, text-plain, */*",
+                        "X-Requested-With": "XMLHttpRequest",
+                        "X-CSRF-TOKEN": token
+                    },
+                    method: 'post',
+                    credentials: "same-origin",
+                    body: JSON.stringify(data),
+                })
+                .then((result) => result.json())
+                .catch(function(error) {
+                    console.log(error);
+                });
+        }
     </script>
 </body>
 
