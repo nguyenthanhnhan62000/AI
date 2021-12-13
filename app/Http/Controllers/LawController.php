@@ -19,24 +19,28 @@ class LawController extends Controller
 
     public function index()
     {
+       
+    }
+    public function post_search(Request $request){
         $client = new Client();
-        $url = 'https://thuvienphapluat.vn/van-ban/Bat-dong-san/Luat-Dat-dai-2003-13-2003-QH11-51685.aspx';
-
+        $url = 'https://thuvienphapluat.vn/van-ban/'. $request->path;
         $page = $client->request('GET', $url);
-
         $page->filter('p')->each(function ($item) {
             $it = $item->text();
             if ((Str::contains($it,'Chương') || Str::contains($it,'CHƯƠNG')) && (strpos($it,'Chương') === 0 || strpos($it,'CHƯƠNG') === 0 )) {
                 $this->chapter = $it;
                 $this->child = '';
-            }else if(Str::contains($it,'Điều') && strpos($it,'Điều') === 0){
+            }else if((Str::contains($it,'Điều') && strpos($it,'Điều') === 0 ) || (Str::contains($it,"“Điều"))  ){
                 $this->child = $it;
+
             }else if($this->chapter !== '' && $this->child !== ''){
                 $this->results[$this->chapter][$this->child][] = $it;
+
+            }else if($this->chapter === '' && $this->child !== ''){
+                $this->results[$this->child][] = $it;  
             }
         });
-        dd($this->results);
-
+        return response()->json(['data' =>$this->results]);
     }
 
     /**
