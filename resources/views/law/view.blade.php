@@ -18,17 +18,15 @@
     <div class="container mt-4">
         <div class="form-group">
             <input type="text" class="form-control searchText" placeholder="Search" value='chương'>
-            <input type="hidden" class="form-control dataFromServe" placeholder="Search" value='{{ $data }}'>
+            <input type="hidden" class="form-control dataFromServe" value='{{ $data }}'>
+            <input type="hidden" class="form-control content1" value='{{ $content1 }}'>
 
         </div>
         <button class="btnSearch btn btn-primary">Search</button>
         <hr>
         <hr>
     </div>
-    <div class="container">
-
-
-        {!! $law->content !!}
+    <div class="container showContent1">
 
 
     </div>
@@ -48,11 +46,13 @@
     <script>
         let searchText = $('.searchText')
         let btnSearch = $('.btnSearch')
+        let content1 = $('.content1')
+        let showContent1 = $('.showContent1')
         let dataFromServe = $('.dataFromServe').val()
         let data = JSON.parse(dataFromServe.toLowerCase())
         let arrSearch = []
-        // console.log(data);
 
+        showContent1.html(content1.val());  
         btnSearch.click(function() {
             arrSearch = []
             let searchTextVal = $('.searchText').val()
@@ -74,26 +74,22 @@
                     }
                 }
             }
-            console.log(arrSearch);
+            // console.log(arrSearch);
         });
 
         async function fetchData(url, data) {
-            let token = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
-            return await fetch(url, {
-                    headers: {
-                        "Content-Type": "application/json",
-                        "Accept": "application/json, text-plain, */*",
-                        "X-Requested-With": "XMLHttpRequest",
-                        "X-CSRF-TOKEN": token
-                    },
-                    method: 'post',
-                    credentials: "same-origin",
-                    body: JSON.stringify(data),
-                })
-                .then((result) => result.json())
-                .catch(function(error) {
-                    console.log(error);
-                });
+            var myHeaders = new Headers();
+            myHeaders.append("Cookie", "ASP.NET_SessionId=y05xs0onhiwct1xscyod3p2r; Culture=vi");
+
+            var requestOptions = {
+                method: 'GET',
+                headers: myHeaders,
+                redirect: 'follow'
+            };
+
+            return await fetch("https://corsanywhere.herokuapp.com/" + url, requestOptions)
+                .then(response => response.text())
+                .catch(error => console.log('error', error));
         }
     </script>
 </body>

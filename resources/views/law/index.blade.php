@@ -13,7 +13,7 @@
 </head>
 
 <body>
-    <div class="container">
+    {{-- <div class="container">
         <table class="table">
             <thead>
                 <tr>
@@ -35,16 +35,22 @@
                 @endforeach
             </tbody>
         </table>
-    </div>
+    </div> --}}
     <hr>
-    <form action="law" method="post">
-        @csrf
-        <div class="container">
-            <textarea name="content"></textarea>
-            
-            <button type="submit">Submit</button>
+    <div class="container">
+        <div class="row">
+            <div class="col-md-9">
+                <div class="form-group">
+                    <input type="text" name="searchLaw" placeholder="<Tìm Kiếm Văn Bản Pháp Luật>" class="form-control">
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="form-group">
+                    <button type="submit" class="btn btn-success btnSearchLaw" >Tìm Kiếm</button>
+                </div>
+            </div>
         </div>
-    </form>
+    </div>
     <!-- Optional JavaScript -->
     <!-- jQuery first, then Popper.js, then Bootstrap JS -->
     <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
@@ -58,7 +64,9 @@
     </script>
     <script src="https://cdn.ckeditor.com/4.17.1/standard/ckeditor.js"></script>
     <script>
-        CKEDITOR.replace('content');
+        let searchLaw = $('.searchLaw');
+        let btnSearchLaw = $('.btnSearchLaw');
+
     </script>
 </body>
 

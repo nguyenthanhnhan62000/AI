@@ -2,10 +2,10 @@
 
 namespace App\Http\Controllers;
 
-use Goutte\Client;
-use Illuminate\Support\Str;
-use Illuminate\Http\Request;
 use App\Models\law;
+use Goutte\Client;
+use Illuminate\Http\Request;
+use Illuminate\Support\Str;
 
 class LawController extends Controller
 {
@@ -21,30 +21,46 @@ class LawController extends Controller
     public function index()
     {
         $laws = Law::all();
-
         return view('law.index', compact('laws'));
     }
-    public function post_search(Request $request){
-
+    public function post_index(){
         $client = new Client();
-        $url = 'https://thuvienphapluat.vn/van-ban/'. $request->path;
+        $url = 'https://thuvienphapluat.vn/phap-luat/tim-van-ban.aspx?keyword=lu%E1%BA%ADt%20%C4%91%E1%BA%A5t%20%C4%91ai&area=0&type=0&status=0&lan=1&org=0&signer=0&match=True&sort=1&bdate=13/12/1941&edate=14/12/2021';
+        $page = $client->request('GET', $url);
+        $content = $page->filter('.content-0')->each(function($item){
+            echo $item->filter('a')->attr('href');
+        });
+    }
+
+    public function crawl_content()
+    {
+        $client = new Client();
+        $url = 'https://thuvienphapluat.vn/van-ban/Bat-dong-san/Luat-dat-dai-2013-215836.aspx';
+        $page = $client->request('GET', $url);
+        $content = $page->filter('.content1')->html();
+        return $content;
+    }
+    public function post_search(Request $request)
+    {
+        $client = new Client();
+        $url = 'https://thuvienphapluat.vn/van-ban/' . $request->path;
         $page = $client->request('GET', $url);
         $page->filter('p')->each(function ($item) {
             $it = $item->text();
-            if ((Str::contains($it,'Chương') || Str::contains($it,'CHƯƠNG')) && (strpos($it,'Chương') === 0 || strpos($it,'CHƯƠNG') === 0 )) {
+            if ((Str::contains($it, 'Chương') || Str::contains($it, 'CHƯƠNG')) && (strpos($it, 'Chương') === 0 || strpos($it, 'CHƯƠNG') === 0)) {
                 $this->chapter = $it;
                 $this->child = '';
-            }else if((Str::contains($it,'Điều') && strpos($it,'Điều') === 0 ) || (Str::contains($it,"“Điều"))  ){
+            } else if ((Str::contains($it, 'Điều') && strpos($it, 'Điều') === 0) || (Str::contains($it, "“Điều"))) {
                 $this->child = $it;
 
-            }else if($this->chapter !== '' && $this->child !== ''){
+            } else if ($this->chapter !== '' && $this->child !== '') {
                 $this->results[$this->chapter][$this->child][] = $it;
 
-            }else if($this->chapter === '' && $this->child !== ''){
-                $this->results[$this->child][] = $it;  
+            } else if ($this->chapter === '' && $this->child !== '') {
+                $this->results[$this->child][] = $it;
             }
         });
-        return response()->json(['data' =>$this->results]);
+        return response()->json(['data' => $this->results]);
     }
     /**
      * Show the form for creating a new resource.
@@ -80,21 +96,24 @@ class LawController extends Controller
         $page = $client->request('GET', $url);
         $page->filter('p')->each(function ($item) {
             $it = $item->text();
-            if ((Str::contains($it,'Chương') || Str::contains($it,'CHƯƠNG')) && (strpos($it,'Chương') === 0 || strpos($it,'CHƯƠNG') === 0 )) {
+            if ((Str::contains($it, 'Chương') || Str::contains($it, 'CHƯƠNG')) && (strpos($it, 'Chương') === 0 || strpos($it, 'CHƯƠNG') === 0)) {
                 $this->chapter = $it;
                 $this->child = '';
-            }else if((Str::contains($it,'Điều') && strpos($it,'Điều') === 0 ) || (Str::contains($it,"“Điều"))  ){
+            } else if ((Str::contains($it, 'Điều') && strpos($it, 'Điều') === 0) || (Str::contains($it, "“Điều"))) {
                 $this->child = $it;
 
-            }else if($this->chapter !== '' && $this->child !== ''){
+            } else if ($this->chapter !== '' && $this->child !== '') {
                 $this->results[$this->chapter][$this->child][] = $it;
 
-            }else if($this->chapter === '' && $this->child !== ''){
-                $this->results[$this->child][] = $it;  
+            } else if ($this->chapter === '' && $this->child !== '') {
+                $this->results[$this->child][] = $it;
             }
         });
         $data = json_encode($this->results);
-        return view('law.view', compact('law','data'));
+
+
+        $content1 = $this->crawl_content();
+        return view('law.view', compact('law', 'data','content1'));
     }
 
     /**
@@ -131,5 +150,4 @@ class LawController extends Controller
         //
     }
 
-  
 }

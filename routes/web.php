@@ -21,3 +21,7 @@ Route::post('/search_post', [LandPriceController::class, 'search_post'])->name('
 //law--cau_1
 Route::resource('/law', LawController::class);
 Route::post('/law/post_search', [LawController::class, 'post_search']);
+
+Route::get('law/content/crawl_content', [LawController::class, 'crawl_content']);
+
+Route::get('law/post/index', [LawController::class, 'post_index']);

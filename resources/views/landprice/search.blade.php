@@ -220,7 +220,7 @@
                 body: urlencoded,
                 redirect: 'follow'
             };
-            return await fetch(" https://corsanywhere.herokuapp.com/" + url, requestOptions)
+            return await fetch("https://corsanywhere.herokuapp.com/" + url, requestOptions)
                 .then(response => response.text())
                 .then((result) => {
                     let arr = []
