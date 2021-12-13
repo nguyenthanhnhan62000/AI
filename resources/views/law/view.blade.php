@@ -28,7 +28,7 @@
     </div>
     <div class="container showContent1">
 
-
+      
     </div>
     <!-- Optional JavaScript -->
     <!-- jQuery first, then Popper.js, then Bootstrap JS -->
@@ -52,6 +52,7 @@
         let data = JSON.parse(dataFromServe.toLowerCase())
         let arrSearch = []
 
+        console.log(data);
         showContent1.html(content1.val());  
         btnSearch.click(function() {
             arrSearch = []
@@ -74,7 +75,7 @@
                     }
                 }
             }
-            // console.log(arrSearch);
+            console.log(arrSearch);
         });
 
         async function fetchData(url, data) {
