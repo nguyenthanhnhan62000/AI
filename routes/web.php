@@ -14,9 +14,10 @@ use App\Http\Controllers\LandPriceController;
 | contains the "web" middleware group. Now create something great!
 |
 */
-
+// cau_2
 Route::get('/search',  [LandPriceController::class, 'search'])->name('search');
-
 Route::post('/search_post', [LandPriceController::class, 'search_post'])->name('search_post');
 
+//law--cau_1
 Route::resource('/law', LawController::class);
+Route::post('/law/post_search', [LawController::class, 'post_search']);

@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Goutte\Client;
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
+use App\Models\law;
 
 class LawController extends Controller
 {
@@ -19,9 +20,12 @@ class LawController extends Controller
 
     public function index()
     {
-       
+        $laws = Law::all();
+
+        return view('law.index', compact('laws'));
     }
     public function post_search(Request $request){
+
         $client = new Client();
         $url = 'https://thuvienphapluat.vn/van-ban/'. $request->path;
         $page = $client->request('GET', $url);
@@ -42,7 +46,6 @@ class LawController extends Controller
         });
         return response()->json(['data' =>$this->results]);
     }
-
     /**
      * Show the form for creating a new resource.
      *
@@ -70,9 +73,28 @@ class LawController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function show($id)
+    public function show(law $law)
     {
-        //
+        $client = new Client();
+        $url = 'https://thuvienphapluat.vn/van-ban/Bo-may-hanh-chinh/Nghi-dinh-148-2020-ND-CP-sua-doi-mot-so-Nghi-dinh-huong-dan-Luat-Dat-dai-427504.aspx';
+        $page = $client->request('GET', $url);
+        $page->filter('p')->each(function ($item) {
+            $it = $item->text();
+            if ((Str::contains($it,'Chương') || Str::contains($it,'CHƯƠNG')) && (strpos($it,'Chương') === 0 || strpos($it,'CHƯƠNG') === 0 )) {
+                $this->chapter = $it;
+                $this->child = '';
+            }else if((Str::contains($it,'Điều') && strpos($it,'Điều') === 0 ) || (Str::contains($it,"“Điều"))  ){
+                $this->child = $it;
+
+            }else if($this->chapter !== '' && $this->child !== ''){
+                $this->results[$this->chapter][$this->child][] = $it;
+
+            }else if($this->chapter === '' && $this->child !== ''){
+                $this->results[$this->child][] = $it;  
+            }
+        });
+        $data = json_encode($this->results);
+        return view('law.view', compact('law','data'));
     }
 
     /**
