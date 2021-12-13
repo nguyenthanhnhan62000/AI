@@ -58,6 +58,7 @@
             </div>
         </div>
     </div>
+    
     <div class="container showData">
         <div class="row">
 
@@ -87,13 +88,16 @@
             let html = ''
             fetchData('/law/post/index', data).then(function(result) {
                 data = result.data;
-                console.log(data);
                 for (let key in data) {
                     html += `
                             <div class="row">
                                 <div class="col-md-1">${key}</div>
                                 <div class="col-md-7">
-                                    <p><b>${data[key][0]}</b></p>
+                                    <form action="/law/post/show" method="post">
+                                        @csrf
+                                        <input type="hidden" name="path" value="${data[key][1]}">
+                                        <p><button type="submit" class="btn"><b>${data[key][0]}</b></button></p>
+                                    </form>
                                     <p>${data[key][2]}</p>
                                 </div>
                                 <div class="col-md-4">
@@ -108,6 +112,15 @@
                 showData.html(html)
             })
         });
+
+        
+        //redirect To View
+        function redirectToView(path){
+            fetchData('/law/post/show',{path : path}).then((result) => {
+                console.log(1);
+            });
+        }
+        //fetch data
         async function fetchData(url, data) {
             let token = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
             return fetch(url, {

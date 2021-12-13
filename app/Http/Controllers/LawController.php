@@ -2,10 +2,11 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\law;
 use Goutte\Client;
-use Illuminate\Http\Request;
+use App\Models\law;
 use Illuminate\Support\Str;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Redirect;
 
 class LawController extends Controller
 {
@@ -57,10 +58,10 @@ class LawController extends Controller
         return response()->json(['data'=> $data]);
     }
 
-    public function crawl_content()
+    public function crawl_content($path)
     {
         $client = new Client();
-        $url = 'https://thuvienphapluat.vn/van-ban/Bat-dong-san/Luat-dat-dai-2013-215836.aspx';
+        $url = 'https://thuvienphapluat.vn/van-ban/'.$path;
         $page = $client->request('GET', $url);
         $content = $page->filter('.content1')->html();
         return $content;
@@ -136,43 +137,35 @@ class LawController extends Controller
         });
         $data = json_encode($this->results);
 
-
-        $content1 = $this->crawl_content();
+        $content1 = $this->crawl_content('');
         return view('law.view', compact('law', 'data','content1'));
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function edit($id)
+    public function post_show(Request $request)
     {
-        //
-    }
+        $client = new Client();
+        $url = 'https://thuvienphapluat.vn/'.$request->path;
+        $page = $client->request('GET', $url);
+        $page->filter('p')->each(function ($item) {
+            $it = $item->text();
+            if ((Str::contains($it, 'Chương') || Str::contains($it, 'CHƯƠNG')) && (strpos($it, 'Chương') === 0 || strpos($it, 'CHƯƠNG') === 0)) {
+                $this->chapter = $it;
+                $this->child = '';
+            } else if ((Str::contains($it, 'Điều') && strpos($it, 'Điều') === 0) || (Str::contains($it, "“Điều"))) {
+                $this->child = $it;
 
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function update(Request $request, $id)
-    {
-        //
-    }
+            } else if ($this->chapter !== '' && $this->child !== '') {
+                $this->results[$this->chapter][$this->child][] = $it;
 
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function destroy($id)
-    {
-        //
+            } else if ($this->chapter === '' && $this->child !== '') {
+                $this->results[$this->child][] = $it;
+            }
+        });
+        $data = json_encode($this->results);
+
+        $content1 = $this->crawl_content($request->path);
+
+        return view('law.view', compact('data','content1'));
     }
 
 }
