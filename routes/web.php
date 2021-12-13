@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\LawController;
 use App\Http\Controllers\LandPriceController;
 
 /*
@@ -17,3 +18,5 @@ use App\Http\Controllers\LandPriceController;
 Route::get('/search',  [LandPriceController::class, 'search'])->name('search');
 
 Route::post('/search_post', [LandPriceController::class, 'search_post'])->name('search_post');
+
+Route::resource('/law', LawController::class);
