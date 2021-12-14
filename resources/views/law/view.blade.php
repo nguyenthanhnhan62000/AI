@@ -26,9 +26,20 @@
         <hr>
         <hr>
     </div>
+    <div class="container showDataSearch" style="overflow:auto;height: 400px;">
+        <div class="">
+            <h5>Chương 1.</h5>
+            <h6>Điều 1. phạm vi điều chỉnh</h6>
+            <p>luật này quy định về chế độ sở hữu đất đai, quyền hạn và trách nhiệm của nhà nước đại diện chủ sở hữu
+                toàn dân về đất đai và thống nhất quản lý về đất đai, chế độ quản lý và sử dụng đất đai, quyền và nghĩa
+                vụ của người sử dụng đất đối với đất đai thuộc lãnh thổ của nước cộng hòa xã hội chủ nghĩa việt nam
+            </p>
+        </div>
+       
+    </div>
     <div class="container showContent1">
 
-      
+
     </div>
     <!-- Optional JavaScript -->
     <!-- jQuery first, then Popper.js, then Bootstrap JS -->
@@ -48,20 +59,26 @@
         let btnSearch = $('.btnSearch')
         let content1 = $('.content1')
         let showContent1 = $('.showContent1')
+        let showDataSearch = $('.showDataSearch')
         let dataFromServe = $('.dataFromServe').val()
         let data = JSON.parse(dataFromServe.toLowerCase())
         let arrSearch = []
 
-        console.log(data);
-        showContent1.html(content1.val());  
+        showContent1.html(content1.val());
         btnSearch.click(function() {
             arrSearch = []
-            let searchTextVal = $('.searchText').val()
+            let htmlResultSearch = ''
+            let searchTextVal = ($('.searchText').val()).toLowerCase()
+
+            //begin add result search to arr
             for (let key in data) {
                 if (key.indexOf(searchTextVal) >= 0) {
                     arrSearch.push(key)
                 }
                 for (let key_ in data[key]) {
+                    if (key_.indexOf(searchTextVal) >= 0) {
+                        arrSearch.push([key, key_])
+                    }
                     if (typeof data[key][key_] === 'object') {
                         data[key][key_].forEach((item) => {
                             if (item.indexOf(searchTextVal) >= 0) {
@@ -75,9 +92,29 @@
                     }
                 }
             }
-            console.log(arrSearch);
-        });
+            //end add result search to arr
+            
+            //begin show result search to view
+            arrSearch.forEach((result) => {
+                htmlResultSearch += `
+                                    <div class="">
+                                        <h5>${result[0]}</h5>
+                                        <h6>${result[1]}</h6>
+                                        <p>${result[2]}</p>
+                                        <hr>
+                                    </div>
+                
+                `
+            })
+            showDataSearch.html(htmlResultSearch)
+            // console.log(arrSearch);
+            //end show result search to view
 
+        });
+    </script>
+    <script>
+       
+       
         async function fetchData(url, data) {
             var myHeaders = new Headers();
             myHeaders.append("Cookie", "ASP.NET_SessionId=y05xs0onhiwct1xscyod3p2r; Culture=vi");
@@ -92,6 +129,8 @@
                 .then(response => response.text())
                 .catch(error => console.log('error', error));
         }
+        function hideddrivetip() {}
+        function LS_Tootip_Type_Bookmark_Archive() {}
     </script>
 </body>
 

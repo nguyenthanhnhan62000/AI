@@ -3,7 +3,6 @@
 namespace App\Http\Controllers;
 
 use Goutte\Client;
-use App\Models\law;
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Redirect;
@@ -21,8 +20,9 @@ class LawController extends Controller
     public $index;
     public function index()
     {
-        $laws = Law::all();
-        return view('law.index', compact('laws'));
+        // $it = 'Điều 1. Điều 126 của Luật nhà ở được sửa đổi, bổ sung như sau:';
+        // dd(stripos($it, 'Điều'));
+        return view('law.index');
     }
     public function post_index(Request $request){
         $client = new Client();
@@ -88,44 +88,18 @@ class LawController extends Controller
         });
         return response()->json(['data' => $this->results]);
     }
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function create()
-    {
-        //
-    }
-
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
-     */
-    public function store(Request $request)
-    {
-        //
-    }
-
-    /**
-     * Display the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function show(law $law)
+   
+    public function show()
     {
         $client = new Client();
         $url = 'https://thuvienphapluat.vn/van-ban/Bo-may-hanh-chinh/Nghi-dinh-148-2020-ND-CP-sua-doi-mot-so-Nghi-dinh-huong-dan-Luat-Dat-dai-427504.aspx';
         $page = $client->request('GET', $url);
         $page->filter('p')->each(function ($item) {
             $it = $item->text();
-            if ((Str::contains($it, 'Chương') || Str::contains($it, 'CHƯƠNG')) && (strpos($it, 'Chương') === 0 || strpos($it, 'CHƯƠNG') === 0)) {
+            if (stripos($it, 'Chương') === 0 || stripos($it, 'CHƯƠNG') === 0) {
                 $this->chapter = $it;
                 $this->child = '';
-            } else if ((Str::contains($it, 'Điều') && strpos($it, 'Điều') === 0) || (Str::contains($it, "“Điều"))) {
+            } else if (stripos($it, 'Điều') === 0){
                 $this->child = $it;
 
             } else if ($this->chapter !== '' && $this->child !== '') {
@@ -138,7 +112,7 @@ class LawController extends Controller
         $data = json_encode($this->results);
 
         $content1 = $this->crawl_content('');
-        return view('law.view', compact('law', 'data','content1'));
+        return view('law.view', compact('data','content1'));
     }
 
     public function post_show(Request $request)
