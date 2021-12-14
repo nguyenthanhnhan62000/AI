@@ -12,6 +12,12 @@
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
         integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
     <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/11.3.1/styles/default.min.css">
+    <style>
+        mark {
+            background: #e5e576;
+        }
+
+    </style>
 </head>
 
 <body>
@@ -35,7 +41,7 @@
                 vụ của người sử dụng đất đối với đất đai thuộc lãnh thổ của nước cộng hòa xã hội chủ nghĩa việt nam
             </p>
         </div>
-       
+
     </div>
     <div class="container showContent1">
 
@@ -93,18 +99,34 @@
                 }
             }
             //end add result search to arr
-            
+
             //begin show result search to view
             arrSearch.forEach((result) => {
-                htmlResultSearch += `
-                                    <div class="">
-                                        <h5>${result[0]}</h5>
-                                        <h6>${result[1]}</h6>
-                                        <p>${result[2]}</p>
+
+                if (typeof result === 'string') {
+                    let result_ = result.replace(searchTextVal, `<mark>${searchTextVal}</mark>`);
+                    htmlResultSearch += `<div class="">
+                                            <h5>${result_}</h5>
+                                        </div>
                                         <hr>
-                                    </div>
-                
-                `
+                    `
+                } else {
+                    let r0 = result[0]
+                    let r1 = result[1]
+                    let r2 = result[2]
+                    let regularexp = new RegExp(searchTextVal, 'gi');
+                    r1 = r1.replace(regularexp, `<mark>${searchTextVal}</mark>`)
+                    r2 !== undefined ? r2 = r2.replace(regularexp, '<mark>'+searchTextVal+'</mark>') : '' 
+                    htmlResultSearch += `
+                                        <div class="">
+                                            <h5>${r0}</h5>
+                                            <h6>${r1}</h6>
+                                            <p>${r2}</p>
+                                        </div>
+                                        <hr>
+                    
+                    `
+                }
             })
             showDataSearch.html(htmlResultSearch)
             // console.log(arrSearch);
@@ -113,8 +135,6 @@
         });
     </script>
     <script>
-       
-       
         async function fetchData(url, data) {
             var myHeaders = new Headers();
             myHeaders.append("Cookie", "ASP.NET_SessionId=y05xs0onhiwct1xscyod3p2r; Culture=vi");
@@ -129,7 +149,9 @@
                 .then(response => response.text())
                 .catch(error => console.log('error', error));
         }
+
         function hideddrivetip() {}
+
         function LS_Tootip_Type_Bookmark_Archive() {}
     </script>
 </body>
