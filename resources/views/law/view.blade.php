@@ -29,7 +29,9 @@
 
         </div>
         <button class="btnSearch btn btn-primary">Search</button>
-        <hr>
+        <div class="mt-4">
+            <em class="amount_search">0</em> kết quả tìm kiếm
+        </div>
         <hr>
     </div>
     <div class="container showDataSearch" style="overflow:auto;height: 400px;">
@@ -44,7 +46,7 @@
 
     </div>
     <div class="container showContent1">
-
+     
 
     </div>
     <!-- Optional JavaScript -->
@@ -66,6 +68,7 @@
         let content1 = $('.content1')
         let showContent1 = $('.showContent1')
         let showDataSearch = $('.showDataSearch')
+        let amount_search = $('.amount_search')
         let dataFromServe = $('.dataFromServe').val()
         let data = JSON.parse(dataFromServe.toLowerCase())
         let arrSearch = []
@@ -101,12 +104,17 @@
             //end add result search to arr
 
             //begin show result search to view
-            arrSearch.forEach((result) => {
+            arrSearch.forEach((result,index) => {
 
                 if (typeof result === 'string') {
                     let result_ = result.replace(searchTextVal, `<mark>${searchTextVal}</mark>`);
-                    htmlResultSearch += `<div class="">
-                                            <h5>${result_}</h5>
+                    htmlResultSearch += `<div class="row">
+                                            <div class="col-md-1">
+                                                <p>${index+1}</p>
+                                            </div>
+                                            <div class="col-md-11">
+                                                <h5>${result_}</h5>
+                                            </div>
                                         </div>
                                         <hr>
                     `
@@ -116,18 +124,23 @@
                     let r2 = result[2]
                     let regularexp = new RegExp(searchTextVal, 'gi');
                     r1 = r1.replace(regularexp, `<mark>${searchTextVal}</mark>`)
-                    r2 !== undefined ? r2 = r2.replace(regularexp, '<mark>'+searchTextVal+'</mark>') : '' 
+                    r2 = r2 !== undefined ?  r2.replace(regularexp, '<mark>'+searchTextVal+'</mark>') : '' 
                     htmlResultSearch += `
-                                        <div class="">
-                                            <h5>${r0}</h5>
-                                            <h6>${r1}</h6>
-                                            <p>${r2}</p>
+                                        <div class="row">
+                                            <div class="col-md-1 text-center">
+                                                <p>${index+1}</p>
+                                            </div>
+                                            <div class="col-md-11">
+                                                <h5>${r0}</h5>
+                                                <h6>${r1}</h6>
+                                                <p>${r2}</p>
+                                            </div>
                                         </div>
                                         <hr>
-                    
                     `
                 }
             })
+            amount_search.html(arrSearch.length);
             showDataSearch.html(htmlResultSearch)
             // console.log(arrSearch);
             //end show result search to view
