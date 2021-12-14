@@ -3,6 +3,7 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\LawController;
 use App\Http\Controllers\LandPriceController;
+use App\Http\Controllers\CertificatesLandController;
 
 /*
 |--------------------------------------------------------------------------
@@ -27,3 +28,6 @@ Route::get('law/content/crawl_content', [LawController::class, 'crawl_content'])
 Route::post('law/post/index', [LawController::class, 'post_index']);
 
 Route::post('law/post/show', [LawController::class, 'post_show']);
+
+//cau 3 
+Route::get('cau_3/search',[CertificatesLandController::class, 'search'])->name('cau_3.search');
