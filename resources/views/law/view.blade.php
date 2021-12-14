@@ -74,11 +74,19 @@
         let arrSearch = []
 
         showContent1.html(content1.val());
+        
         btnSearch.click(function() {
             arrSearch = []
             let htmlResultSearch = ''
             let searchTextVal = ($('.searchText').val()).toLowerCase()
 
+            //begin highlight content
+
+            let regular = new RegExp(searchTextVal, 'gi');
+            showContent1_ = (content1.val()).replace(regular, `<mark>${searchTextVal}</mark>`)
+            showContent1.html(showContent1_);
+
+            //end highlight content
             //begin add result search to arr
             for (let key in data) {
                 if (key.indexOf(searchTextVal) >= 0) {
@@ -142,7 +150,6 @@
             })
             amount_search.html(arrSearch.length);
             showDataSearch.html(htmlResultSearch)
-            // console.log(arrSearch);
             //end show result search to view
 
         });
@@ -164,8 +171,8 @@
         }
 
         function hideddrivetip() {}
-
         function LS_Tootip_Type_Bookmark_Archive() {}
+        function LS_Tootip_Type_Bookmark_DC_Archive(){}
     </script>
 </body>
 

@@ -69,11 +69,11 @@
                     <th>Quận/Huyện</th>
                     <th>Tên đường/Làng xã</th>
                     <th>Đoạn: Từ - Đến</th>
-                    <th>VTV1</th>
-                    <th>VTV2</th>
-                    <th>VTV3</th>
-                    <th>VTV4</th>
-                    <th>VTV5</th>
+                    <th>VT1</th>
+                    <th>VT2</th>
+                    <th>VT3</th>
+                    <th>VT4</th>
+                    <th>VT5</th>
                     <th>Loại</th>
                 </tr>
             </thead>
