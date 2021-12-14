@@ -78,32 +78,34 @@
         btnSearch.click(function() {
             arrSearch = []
             let htmlResultSearch = ''
+
             let searchTextVal = ($('.searchText').val()).toLowerCase()
 
             //begin highlight content
-
             let regular = new RegExp(searchTextVal, 'gi');
             showContent1_ = (content1.val()).replace(regular, `<mark>${searchTextVal}</mark>`)
             showContent1.html(showContent1_);
-
             //end highlight content
+
             //begin add result search to arr
             for (let key in data) {
-                if (key.indexOf(searchTextVal) >= 0) {
+                // key = key.toLowerCase();
+                if ((key.toLowerCase()).indexOf(searchTextVal) >= 0) {
                     arrSearch.push(key)
                 }
                 for (let key_ in data[key]) {
-                    if (key_.indexOf(searchTextVal) >= 0) {
-                        arrSearch.push([key, key_])
+                    // key_ = key_.toLowerCase();
+                    if ((key_.toLowerCase()).indexOf(searchTextVal) >= 0) {
+                        arrSearch.push([key.toLowerCase(), key_])
                     }
                     if (typeof data[key][key_] === 'object') {
                         data[key][key_].forEach((item) => {
-                            if (item.indexOf(searchTextVal) >= 0) {
+                            if ((item.toLowerCase()).indexOf(searchTextVal) >= 0) {
                                 arrSearch.push([key, key_, item])
                             }
                         })
                     } else {
-                        if (data[key][key_].indexOf(searchTextVal) >= 0) {
+                        if ((data[key][key_].toLowerCase()).indexOf(searchTextVal) >= 0) {
                             arrSearch.push([key, data[key][key_]])
                         }
                     }
@@ -115,7 +117,7 @@
             arrSearch.forEach((result,index) => {
 
                 if (typeof result === 'string') {
-                    let result_ = result.replace(searchTextVal, `<mark>${searchTextVal}</mark>`);
+                    let result_ = (result.toLowerCase()).replace(searchTextVal, `<mark>${searchTextVal}</mark>`);
                     htmlResultSearch += `<div class="row">
                                             <div class="col-md-1">
                                                 <p>${index+1}</p>
@@ -127,11 +129,12 @@
                                         <hr>
                     `
                 } else {
-                    let r0 = result[0]
-                    let r1 = result[1]
-                    let r2 = result[2]
+                    let r0 = result[0].toLowerCase()
+                    let r1 = result[1].toLowerCase()
+                    let r2 = result[2] !== undefined ? result[2].toLowerCase() : ''
                     let regularexp = new RegExp(searchTextVal, 'gi');
-                    r1 = r1.replace(regularexp, `<mark>${searchTextVal}</mark>`)
+                    r0 = r0.replace(regularexp, `<mark>${searchTextVal}</mark>`)
+                    r1 = r1 !== undefined ?  r1.replace(regularexp, '<mark>'+searchTextVal+'</mark>') : '' 
                     r2 = r2 !== undefined ?  r2.replace(regularexp, '<mark>'+searchTextVal+'</mark>') : '' 
                     htmlResultSearch += `
                                         <div class="row">
@@ -148,6 +151,7 @@
                     `
                 }
             })
+            console.log(data);
             amount_search.html(arrSearch.length);
             showDataSearch.html(htmlResultSearch)
             //end show result search to view

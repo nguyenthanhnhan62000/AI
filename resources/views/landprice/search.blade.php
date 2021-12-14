@@ -117,6 +117,7 @@
             let htmlAmountPagin = '';
             fetchDataSearch('/search_post', slTT.val(), slQH.val(), slTD.val(), slMG.val()).then((result) => {
                 result_ = result.data 
+                console.log(result_);
                 amount.html(result.amount)
                 amountPagin = result.amount/100;
                 for (let i = 1; i < amountPagin; i++) {
