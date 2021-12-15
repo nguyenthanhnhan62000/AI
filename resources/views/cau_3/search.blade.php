@@ -23,7 +23,7 @@
 
         <div class="" style="margin-top:40px">
             <h4>Search Everything</h4>
-            <form method="get" action="{{ route('cau_3.search') }}">
+            <form method="GET" action="{{ route('cau_3.search') }}">
                 <div class="form-group">
                     <input type="text" name="keyword" class="form-control" value="<?php if (isset($_GET['keyword'])) {
                         echo $_GET['keyword'];
