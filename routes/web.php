@@ -31,3 +31,11 @@ Route::post('law/post/show', [LawController::class, 'post_show']);
 
 //cau 3 
 Route::get('cau_3/search',[CertificatesLandController::class, 'search'])->name('cau_3.search');
+
+
+
+//data mining
+Route::get('/data_mining/data',[LawController::class, 'sendToDataMining']);
+Route::post('/data_mining/post_test',[LawController::class, 'post_test']);
+
+
