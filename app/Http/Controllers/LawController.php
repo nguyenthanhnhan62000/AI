@@ -213,5 +213,106 @@ class LawController extends Controller
         }
         return $dataNew;
     }
+
+
+    //data mining 
+    public $array;
+    public $arrayInput;
+    public function test(){
+        
+        $string1 = 'HLV Park Hang Seo nói gì sau chiến thắng tưng bừng trước Pakistan?';
+        $string2 = "HLV Park Hang-seo 'mất niềm tin', tiết lộ về 2 pha hỏng ăn penalty liên tiếp của Công Phượng";
+        $string3 = "Xả súng kinh hoàng tại Điện Biên khiến 2 vợ chồng tử vong" ;
+        $string4 = "Xả súng kinh hoàng tại Điện Biên khiến 2 vợ chồng tử vong" ;
+        $this->arrayInput = [$string1, $string2, $string3];
+        $arrText = [];
+        $space = [];
+        // all text
+        foreach ($this->arrayInput as $key => $item) {
+            $it = explode(" ", $item);
+            foreach ($it as $value) {
+                $arrText[] = $value;
+            }
+        }
+        $this->array = array_unique($arrText); 
+        // dd($array);
+
+        foreach ($this->arrayInput as $items){
+      
+            foreach ($this->array as $key => $item){
+                $space[$items][] = $this->FindTFIDF($items, $item);
+            }
+           
+        }
+        // dd($space["Xả súng kinh hoàng tại Điện Biên khiến 2 vợ chồng tử vong"]);
+
+
+        $index = $this->FindClosestClusterCenter($space, $space["HLV Park Hang-seo 'mất niềm tin', tiết lộ về 2 pha hỏng ăn penalty liên tiếp của Công Phượng"]);
+        
+        // resultSet[index].GroupedDocument.Add(obj);
+        
+    }
+    public function FindTFIDF($document, $term){
+
+        $tf = $this->FindTermFrequency($document, $term);
+        $idf = $this->FindInverseDocumentFrequency($term);
+
+        return $tf * $idf;
+    }
+    public function FindTermFrequency($document, $term){
+        $arr = explode(" ",$document);
+        $count = 0 ;
+        foreach($arr as $item){
+            if (Str::contains(strtoupper($item),strtoupper($term))) {
+                $count++;
+            }
+        }
+        return (float)$count/(count($arr)+count($arr)-1);
+    }
+    public function FindInverseDocumentFrequency($term){
+        $count = 0;
+        foreach($this->arrayInput as $item){
+            if (Str::contains(strtoupper($item),strtoupper($term))) {
+                $count++;
+            }
+        }
+        return (float)log((float)count($this->arrayInput)/(float)$count);
+    }
+    public function FindClosestClusterCenter($cluster,$obj){
+        $similarityMeasure = [];
+        foreach($cluster as $key =>  $item){
+
+        
+            $similarityMeasure[] = $this->FindCosineSimilarity($item, $obj); 
+            
+        }
+        dd($similarityMeasure);
+   
+
+    }
+    public function FindCosineSimilarity($vecA,$vecB){
+        $dotProduct = $this->DotProduct($vecA, $vecB);
+        $magnitudeOfA = $this->Magnitude($vecA);
+        $magnitudeOfB = $this->Magnitude($vecB);
+        $result = $dotProduct / ($magnitudeOfA * $magnitudeOfB);
+
+     
+        return (float)$result;
+    }
+
+    public function DotProduct($vecA, $vecB){
+        $dotProduct = 0;
+        for ($i = 0; $i < count($vecA); $i++)
+        {
+            $dotProduct += ($vecA[$i] * $vecB[$i]);
+        }
+
+        return $dotProduct;
+    }
+    public function Magnitude($vector){
+
+        return (float)Sqrt($this->DotProduct($vector, $vector));
+    }
+
 }
 

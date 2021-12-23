@@ -38,4 +38,6 @@ Route::get('cau_3/search',[CertificatesLandController::class, 'search'])->name('
 Route::get('/data_mining/data',[LawController::class, 'sendToDataMining']);
 Route::post('/data_mining/post_test',[LawController::class, 'post_test']);
 
+Route::get('/data_mining/test',[LawController::class, 'test']);
+
 
