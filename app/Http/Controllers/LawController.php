@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use Goutte\Client;
+use App\Models\Mining;
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Redirect;
@@ -161,7 +162,7 @@ class LawController extends Controller
         $dataNew = [];
 
         foreach ($data as $key => $items) {
-            
+
             foreach ($items as $key_ => $item) {
 
                 foreach ($item as $key__ => $it) {
@@ -170,14 +171,13 @@ class LawController extends Controller
                     $obj = (object)$arr;
                     $dataNew[] = $obj;
                 }
-
             }
         }
         return $dataNew;
-
     }
 
-    public function post_test(Request $request){
+    public function post_test(Request $request)
+    {
 
         $client = new Client();
         $page = $client->request('GET', $request->url);
@@ -199,7 +199,7 @@ class LawController extends Controller
         $dataNew = [];
 
         foreach ($data as $key => $items) {
-            
+
             foreach ($items as $key_ => $item) {
 
                 foreach ($item as $key__ => $it) {
@@ -217,18 +217,29 @@ class LawController extends Controller
     //data mining 
     public $array;
     public $arrayInput;
-    public function test(){
-        
-        $string1 = "HLV Park Hang Seo nói gì sau chiến thắng tưng bừng trước Pakistan?";
-        $string2 = "HLV Park Hang-seo 'mất niềm tin', tiết lộ về 2 pha hỏng ăn penalty liên tiếp của Công Phượng";
-        $string3 = "Xả súng kinh hoàng tại Điện Biên khiến 2 vợ chồng tử vong" ;
-        $string5 = "Nghi án nổ súng ở Điện Biên, hai vợ chồng tử vong tại chỗ" ;
-        $string6 = "Sập cầu ở Ý, 35 người thiệt mạng" ;
-        $string7 = "Công Phượng đá hỏng 2 quả penalty, bố mẹ ở nhà nghĩ gì?";
-        $string4 = "HLV Park Hang-seo 'mất niềm tin',";
+    public function test()
+    {
+
+        // $string1 = "HLV Park Hang Seo nói gì sau chiến thắng tưng bừng trước Pakistan?";
+        // $string2 = "HLV Park Hang-seo 'mất niềm tin', tiết lộ về 2 pha hỏng ăn penalty liên tiếp của Công Phượng";
+        // $string3 = "Xả súng kinh hoàng tại Điện Biên khiến 2 vợ chồng tử vong" ;
+        // $string5 = "Nghi án nổ súng ở Điện Biên, hai vợ chồng tử vong tại chỗ" ;
+        // $string6 = "Sập cầu ở Ý, 35 người thiệt mạng" ;
+        // $string7 = "Công Phượng đá hỏng 2 quả penalty, bố mẹ ở nhà nghĩ gì?";
+        $string4 = "Ông Cao Hữu Hiếu, Tổng giám đốc Vinatex cho biết, năm nay có sự phân hoá giữa mức thưởng của doanh nghiệp dệt may phía Nam, Bắc và Trung trong tập đoàn.";
+
+        $this->arrayInput = $this->guess_mining();
+        // dd($this->arrayInput);
+        // foreach ($data as $key => $value) {
+        //     $this->arrayInput[] = $value;
+        // }
+        // dd($this->arrayInput);
+        // dd($data);
 
 
-        $this->arrayInput = [$string1, $string2, $string3,$string5,$string6,$string7];
+        // dd($this->arrayInput);
+        // $this->arrayInput = [$string1, $string2, $string3,$string5,$string6,$string7];
+        // dd($this->arrayInput);
         $arrText = [];
         $space = [];
         $space_guess = [];
@@ -239,108 +250,111 @@ class LawController extends Controller
                 $arrText[] = $value;
             }
         }
-        $this->array = array_unique($arrText); 
+        $this->array = array_unique($arrText);
         // dd($array);
 
-        foreach ($this->arrayInput as $items){
-            foreach ($this->array as $key => $item){
+        foreach ($this->arrayInput as $items) {
+            foreach ($this->array as $key => $item) {
                 $space[$items][] = $this->FindTFIDF($items, $item);
             }
         }
 
-        foreach ($this->array as $key => $item){
+        foreach ($this->array as $key => $item) {
             $space_guess[$string4][] = $this->FindTFIDF($string4, $item);
         }
 
 
         $index = $this->FindClosestClusterCenter($space, $space_guess[$string4]);
-        
-        
-        
     }
-    public function FindTFIDF($document, $term){
-      
+    public function FindTFIDF($document, $term)
+    {
+
         $tf = $this->FindTermFrequency($document, $term);
         $idf = $this->FindInverseDocumentFrequency($term);
 
         return $tf * $idf;
     }
-    public function FindTermFrequency($document, $term){
-    
-        $arr = explode(" ",$document);
-        $count = 0 ;
-        foreach($arr as $item){
-           if (Str::contains(strtoupper($term),strtoupper($item))) {
+    public function FindTermFrequency($document, $term)
+    {
+
+        $arr = explode(" ", $document);
+        $count = 0;
+        foreach ($arr as $item) {
+            if (Str::contains(strtoupper($term), strtoupper($item))) {
                 $count++;
             }
         }
-        return (float)$count/(count($arr)+count($arr)-1);
+        return (float)$count / (count($arr) + count($arr) - 1);
     }
-    public function FindInverseDocumentFrequency($term){
+    public function FindInverseDocumentFrequency($term)
+    {
         $count = 0;
-        foreach($this->arrayInput as $item){
+        foreach ($this->arrayInput as $item) {
             // echo strtoupper($item).'---'.strtoupper($term) .'--'.Str::contains(strtoupper($item),strtoupper($term)). '<br>';
 
-            if (Str::contains(strtoupper($item),strtoupper($term))) {
+            if (Str::contains(strtoupper($item), strtoupper($term))) {
                 $count++;
             }
         }
-        return (float)log((float)count($this->arrayInput)/(float)$count);
+        return (float)log((float)$count / (1 + (float)count($this->arrayInput)));
     }
-    public function FindClosestClusterCenter($cluster,$obj){
+    public function FindClosestClusterCenter($cluster, $obj)
+    {
         $similarityMeasure = [];
-        foreach($cluster as $key =>  $item){
-            
-            $similarityMeasure[] = $this->FindCosineSimilarity($item, $obj); 
-            
+        foreach ($cluster as $key =>  $item) {
+
+            $similarityMeasure[] = $this->FindCosineSimilarity($item, $obj);
         }
         dd($similarityMeasure);
-   
-
     }
-    public function FindCosineSimilarity($vecA,$vecB){
+    public function FindCosineSimilarity($vecA, $vecB)
+    {
         $dotProduct = $this->DotProduct($vecA, $vecB);
         $magnitudeOfA = $this->Magnitude($vecA);
         $magnitudeOfB = $this->Magnitude($vecB);
-        $result = $dotProduct / ($magnitudeOfA * $magnitudeOfB);
-
-     
+        $result = 0;
+        if ($magnitudeOfA * $magnitudeOfB != 0) {
+            $result = $dotProduct / ($magnitudeOfA * $magnitudeOfB);
+        }
         return (float)$result;
     }
 
-    public function DotProduct($vecA, $vecB){
+    public function DotProduct($vecA, $vecB)
+    {
         // dd($vecA, $vecB);
         $dotProduct = 0;
-        for ($i = 0; $i < count($vecA); $i++)
-        {
+        for ($i = 0; $i < count($vecA); $i++) {
             $dotProduct += ($vecA[$i] * $vecB[$i]);
         }
 
         return $dotProduct;
     }
-    public function Magnitude($vector){
+    public function Magnitude($vector)
+    {
 
         return (float)Sqrt($this->DotProduct($vector, $vector));
     }
 
 
-    public $item ;
-    public $text ;
+    public $item;
+    public $text;
     public $href;
-    public function test_data_mining(){
-    
+    public function test_data_mining()
+    {
+
         $client = new Client();
         $url = 'https://vnexpress.net/';
         $pageOra = $client->request('GET', $url);
         $this->index = 0;
         $pageOra->filter('.parent li a')->each(function ($item) {
-            if ($item->text() != "" 
-            && $item->text() != "Video" 
-            && $item->text() != "Tất cả" 
-            && $item->text() != "Mới nhất" 
-            && $item->text() != "Podcasts") 
-            {
-                $_url = 'https://vnexpress.net'.$item->attr('href');
+            if (
+                $item->text() != ""
+                && $item->text() != "Video"
+                && $item->text() != "Tất cả"
+                && $item->text() != "Mới nhất"
+                && $item->text() != "Podcasts"
+            ) {
+                $_url = 'https://vnexpress.net' . $item->attr('href');
                 $client = new Client();
                 $page = $client->request('GET', $_url);
                 $this->text = $item->text();
@@ -348,19 +362,47 @@ class LawController extends Controller
                 $page->filter('.ul-nav-folder a')->each(function ($it) {
 
 
-                    $this->results[] = [ $this->text, $this->href, $it->text(),$it->attr('href')];
+                    $this->results[] = [$this->text, $this->href, $it->text(), $it->attr('href')];
                 });
                 $this->index++;
             }
         });
 
         // dd($this->results);
-        foreach($this->results as $index => $result){
-            $url_ = 'https://vnexpress.net'.$result[3];
-            echo $url_. '<br>';
+        foreach ($this->results as $index => $result) {
+            $url_ = 'https://vnexpress.net' . $result[3];
+            // Mining::create([
+            //     "url" => $url_
+            // ]);
+            echo $url_ . '<br>';
         }
-        
     }
+    public $url;
 
+    public function guess_mining()
+    {
+        $data = Mining::all();
+        foreach ($data as $key => $result) {
+
+            $this->text = "";
+            $this->url = $result->url;
+            $client = new Client();
+            $page = $client->request('GET', $this->url);
+
+            $page->filter('.col-left-top h3 a')->each(function ($item) {
+
+
+                $_url = $item->attr('href');
+                $client = new Client();
+                $_page = $client->request('GET', $_url);
+                $this->text = $this->text. $_page->filter('.fck_detail')->text();
+                // echo '<br>';
+                
+            });
+            $this->results[] = $this->text;
+            // $this->results[] = mb_substr($this->text, 0,500,'UTF-8');
+        }
+        // dd($this->results);
+        return $this->results;
+    }
 }
-
