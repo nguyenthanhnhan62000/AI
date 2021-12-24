@@ -40,4 +40,6 @@ Route::post('/data_mining/post_test',[LawController::class, 'post_test']);
 
 Route::get('/data_mining/test',[LawController::class, 'test']);
 
+Route::get('/data_mining/test_data_mining',[LawController::class, 'test_data_mining']);
+
 

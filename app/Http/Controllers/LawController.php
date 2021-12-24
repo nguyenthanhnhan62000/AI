@@ -180,8 +180,7 @@ class LawController extends Controller
     public function post_test(Request $request){
 
         $client = new Client();
-        $url = $request->url;
-        $page = $client->request('GET', $url);
+        $page = $client->request('GET', $request->url);
         $page->filter('p')->each(function ($item) {
             $it = $item->text();
             if ((Str::contains($it, 'Chương') || Str::contains($it, 'CHƯƠNG')) && (strpos($it, 'Chương') === 0 || strpos($it, 'CHƯƠNG') === 0)) {
@@ -220,13 +219,19 @@ class LawController extends Controller
     public $arrayInput;
     public function test(){
         
-        $string1 = 'HLV Park Hang Seo nói gì sau chiến thắng tưng bừng trước Pakistan?';
+        $string1 = "HLV Park Hang Seo nói gì sau chiến thắng tưng bừng trước Pakistan?";
         $string2 = "HLV Park Hang-seo 'mất niềm tin', tiết lộ về 2 pha hỏng ăn penalty liên tiếp của Công Phượng";
         $string3 = "Xả súng kinh hoàng tại Điện Biên khiến 2 vợ chồng tử vong" ;
-        $string4 = "Xả súng kinh hoàng tại Điện Biên khiến 2 vợ chồng tử vong" ;
-        $this->arrayInput = [$string1, $string2, $string3];
+        $string5 = "Nghi án nổ súng ở Điện Biên, hai vợ chồng tử vong tại chỗ" ;
+        $string6 = "Sập cầu ở Ý, 35 người thiệt mạng" ;
+        $string7 = "Công Phượng đá hỏng 2 quả penalty, bố mẹ ở nhà nghĩ gì?";
+        $string4 = "HLV Park Hang-seo 'mất niềm tin',";
+
+
+        $this->arrayInput = [$string1, $string2, $string3,$string5,$string6,$string7];
         $arrText = [];
         $space = [];
+        $space_guess = [];
         // all text
         foreach ($this->arrayInput as $key => $item) {
             $it = explode(" ", $item);
@@ -238,32 +243,34 @@ class LawController extends Controller
         // dd($array);
 
         foreach ($this->arrayInput as $items){
-      
             foreach ($this->array as $key => $item){
                 $space[$items][] = $this->FindTFIDF($items, $item);
             }
-           
         }
-        // dd($space["Xả súng kinh hoàng tại Điện Biên khiến 2 vợ chồng tử vong"]);
+
+        foreach ($this->array as $key => $item){
+            $space_guess[$string4][] = $this->FindTFIDF($string4, $item);
+        }
 
 
-        $index = $this->FindClosestClusterCenter($space, $space["HLV Park Hang-seo 'mất niềm tin', tiết lộ về 2 pha hỏng ăn penalty liên tiếp của Công Phượng"]);
+        $index = $this->FindClosestClusterCenter($space, $space_guess[$string4]);
         
-        // resultSet[index].GroupedDocument.Add(obj);
+        
         
     }
     public function FindTFIDF($document, $term){
-
+      
         $tf = $this->FindTermFrequency($document, $term);
         $idf = $this->FindInverseDocumentFrequency($term);
 
         return $tf * $idf;
     }
     public function FindTermFrequency($document, $term){
+    
         $arr = explode(" ",$document);
         $count = 0 ;
         foreach($arr as $item){
-            if (Str::contains(strtoupper($item),strtoupper($term))) {
+           if (Str::contains(strtoupper($term),strtoupper($item))) {
                 $count++;
             }
         }
@@ -272,6 +279,8 @@ class LawController extends Controller
     public function FindInverseDocumentFrequency($term){
         $count = 0;
         foreach($this->arrayInput as $item){
+            // echo strtoupper($item).'---'.strtoupper($term) .'--'.Str::contains(strtoupper($item),strtoupper($term)). '<br>';
+
             if (Str::contains(strtoupper($item),strtoupper($term))) {
                 $count++;
             }
@@ -281,8 +290,7 @@ class LawController extends Controller
     public function FindClosestClusterCenter($cluster,$obj){
         $similarityMeasure = [];
         foreach($cluster as $key =>  $item){
-
-        
+            
             $similarityMeasure[] = $this->FindCosineSimilarity($item, $obj); 
             
         }
@@ -301,6 +309,7 @@ class LawController extends Controller
     }
 
     public function DotProduct($vecA, $vecB){
+        // dd($vecA, $vecB);
         $dotProduct = 0;
         for ($i = 0; $i < count($vecA); $i++)
         {
@@ -312,6 +321,45 @@ class LawController extends Controller
     public function Magnitude($vector){
 
         return (float)Sqrt($this->DotProduct($vector, $vector));
+    }
+
+
+    public $item ;
+    public $text ;
+    public $href;
+    public function test_data_mining(){
+    
+        $client = new Client();
+        $url = 'https://vnexpress.net/';
+        $pageOra = $client->request('GET', $url);
+        $this->index = 0;
+        $pageOra->filter('.parent li a')->each(function ($item) {
+            if ($item->text() != "" 
+            && $item->text() != "Video" 
+            && $item->text() != "Tất cả" 
+            && $item->text() != "Mới nhất" 
+            && $item->text() != "Podcasts") 
+            {
+                $_url = 'https://vnexpress.net'.$item->attr('href');
+                $client = new Client();
+                $page = $client->request('GET', $_url);
+                $this->text = $item->text();
+                $this->href = $item->attr('href');
+                $page->filter('.ul-nav-folder a')->each(function ($it) {
+
+
+                    $this->results[] = [ $this->text, $this->href, $it->text(),$it->attr('href')];
+                });
+                $this->index++;
+            }
+        });
+
+        // dd($this->results);
+        foreach($this->results as $index => $result){
+            $url_ = 'https://vnexpress.net'.$result[3];
+            echo $url_. '<br>';
+        }
+        
     }
 
 }
