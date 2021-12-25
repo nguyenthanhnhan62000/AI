@@ -4,6 +4,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\LawController;
 use App\Http\Controllers\MiningController;
 use App\Http\Controllers\LandPriceController;
+use App\Http\Controllers\MiningCau1Controller;
 use App\Http\Controllers\CertificatesLandController;
 
 /*
@@ -39,14 +40,13 @@ Route::get('cau_3/search',[CertificatesLandController::class, 'search'])->name('
 //data mining
 Route::get('/data_mining/data',[LawController::class, 'sendToDataMining']);
 Route::post('/data_mining/post_test',[LawController::class, 'post_test']);
-
 Route::get('/data_mining/test',[MiningController::class, 'test']);
 Route::get('/data_mining/index',[MiningController::class, 'index']);
-
 Route::get('/data_mining/test_data_mining',[MiningController::class, 'test_data_mining']);
-
 Route::get('/data_mining/guess_mining',[MiningController::class, 'guess_mining']);
-
 Route::post('/data_mining/index/post_test',[MiningController::class, 'post_test']);
+
+
+Route::get('/data_mining/cau_1/index',[MiningCau1Controller::class, 'index']);
 
 

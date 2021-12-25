@@ -23,7 +23,6 @@ class MiningController extends Controller
     public $space_guess = [];
 
     public function __construct(){
-
       
 
     }
@@ -176,8 +175,6 @@ class MiningController extends Controller
         return (float)Sqrt($this->DotProduct($vector, $vector));
     }
 
-
-  
     public function test_data_mining()
     {
 
