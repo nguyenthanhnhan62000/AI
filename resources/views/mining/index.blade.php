@@ -17,14 +17,16 @@
     <div class="container mt-4">
         <div class="form-group">
             
-          <textarea  id="guess_test" class="form-control" placeholder="Enter ..."></textarea>
+          <textarea style="height:200px"  id="guess_test" class="form-control" placeholder="Enter ..."></textarea>
+          <input type="hidden" id="array"  value ="{{ $array }}">
+          <input type="hidden" id="space" value ="{{ $space }}">
+          <input type="hidden" id="arrayInput" value ="{{ $arrayInput }}">
         </div>
-        <button type="submit" id="btnsubmit" class="btn btn-primary">Submit</button>
     </div>
-    <div class="container">
+    <div class="container text-center">
+        <button type="submit" id="btnsubmit" class="btn btn-primary">Submit</button>
         <p id="showData"></p>
     </div>
-      
  
     <!-- Optional JavaScript -->
     <!-- jQuery first, then Popper.js, then Bootstrap JS -->
@@ -35,9 +37,13 @@
         var guess_test = $('#guess_test')
         var btnsubmit = $('#btnsubmit')
         var showData = $('#showData')
+        var array = $('#array')
+        var space = $('#space')
+        var arrayInput = $('#arrayInput')
  
         $(btnsubmit).click(function () { 
-            fetchDataSearch('/data_mining/index/post_test',{"guess_test" : guess_test.val()}).then((result) =>{
+            data = { "guess_test" : guess_test.val(),'array' : array.val(),'space' : space.val(),'arrayInput' : arrayInput.val()}
+            fetchDataSearch('/data_mining/index/post_test',data).then((result) =>{
                 var largest = Math.max.apply(Math, result); 
                 console.log(result,largest);
                 result.forEach((element,index) => {
