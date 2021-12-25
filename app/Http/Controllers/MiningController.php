@@ -23,6 +23,9 @@ class MiningController extends Controller
     public $space_guess = [];
 
     public function __construct(){
+    }
+    public function post_test(Request $request){
+
         $this->guess_mining();
         foreach ($this->arrayInput as $key => $item) {
             $it = explode(" ", $item);
@@ -37,22 +40,17 @@ class MiningController extends Controller
                 $this->space[$k][] = $this->FindTFIDF($items, $item);
             }
         }
-
-    }
-    public function post_test(Request $request){
-
         foreach ($this->array as $key => $item) {
             $this->space_guess[0][] = $this->FindTFIDF($request->guess_test, $item);
         }
         $arr = $this->FindClosestClusterCenter($this->space, $this->space_guess[0]);
-
         return json_encode($arr);
     }
     public function index(){
-        // return view('mining.index');
+        return view('mining.index');
 
         
-        return view('mining.index',["data" => $this->arrayInput,'space'=>$this->space]);
+        // return view('mining.index',["data" => $this->arrayInput,'space'=>$this->space]);
     }
     public function test()
     {
@@ -211,7 +209,7 @@ class MiningController extends Controller
                 $_url = $item->attr('href');
                 $client = new Client();
                 $_page = $client->request('GET', $_url);
-                if ($this->index < 2) {
+                if ($this->index < 1) {
                     $this->text = $this->text . $_page->filter('.fck_detail')->text();
                 }
                 $this->index++;

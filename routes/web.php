@@ -18,6 +18,7 @@ use App\Http\Controllers\CertificatesLandController;
 */
 // cau_2
 Route::get('/search',  [LandPriceController::class, 'search'])->name('search');
+Route::get('/index',  [LandPriceController::class, 'index'])->name('index');
 Route::post('/search_post', [LandPriceController::class, 'search_post'])->name('search_post');
 
 //law--cau_1

@@ -15,6 +15,10 @@ class LandPriceController extends Controller
 
         return view('landprice/search');
     }
+
+    public function index(){
+        return view('index');
+    }
     public function search_post(Request $request){
 
         $data = $this->search_gen($request->TT,$request->QH,$request->TD,$request->MG,$request->p);
