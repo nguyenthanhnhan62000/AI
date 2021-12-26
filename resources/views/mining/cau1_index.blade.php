@@ -19,22 +19,42 @@
             <div class="col-md-7">
                 <div class="form-group">
                     <label><b>Nhap URL De Phan Cum Van Ban</b> </label>
-                    <input type="text" id="url" class="form-control" placeholder="..."  value="https://thuvienphapluat.vn/van-ban/Bat-dong-san/Luat-dat-dai-2013-215836.aspx">
-                    <input type="text" id="data" hidden class="form-control" {{ $data }}> <br>
+                    <input type="text" id="url" class="form-control" placeholder="..."
+                        value="https://thuvienphapluat.vn/van-ban/Bat-dong-san/Luat-dat-dai-2013-215836.aspx">
+                    {{-- <input type="text" id="data" hidden class="form-control" {{ $data }}> <br> --}} <br>
                     <button type="button" id="btnGetData" class="btn btn-primary">Lay Du Lieu</button>
-                    <p id="pMsg" style="color:red;font-size:20px;margin-top:2px "></p>
+                    <img src="{{ asset('img/gif.gif') }}" width="100px" id="iLoad_get" style="display:none">
+                    <b>
+                        <p id="pMsg_get" style="color:rgb(0, 255, 0);font-size:20px;margin-top:2px;display:none;">Lay Du
+                            Lieu Thanh Cong</p>
+                    </b>
+
                 </div>
             </div>
             <div class="col-md-5">
                 <div class="form-group">
                     <label for="">Nhap So Cum</label>
                     <input type="text" id="cluster" class="form-control" placeholder="" value="2"> <br>
-                    <button type="button"  id="btnCluster" class="btn btn-primary">Phan Cum</button>
+                    <button type="button" id="btnCluster" class="btn btn-primary">Phan Cum</button>
+                    <img src="{{ asset('img/gif.gif') }}" width="100px" id="iLoad_cluster" style="display:none">
+                    <b>
+                        <p id="pMsg_cluster" style="color:rgb(0, 255, 0);font-size:20px;margin-top:2px;display:none;">
+                            Phan Cum Thanh Cong</p>
+                    </b>
+
                 </div>
             </div>
         </div>
-        
-       
+
+    </div>
+    <div class="container mt-4" id="showDataCluster">
+        <h4 class="text-center">--------------------------------cluster 1---------------------------------</h4>
+        <p>Chương Cộng Hòa Xã Hội Chủ Nghĩa Việt Nam</p>
+        <p>Chương Cộng Hòa Xã Hội Chủ Nghĩa Việt Nam</p>
+        <p>Chương Cộng Hòa Xã Hội Chủ Nghĩa Việt Nam</p>
+    </div>
+
+
     </div>
     <!-- Optional JavaScript -->
     <!-- jQuery first, then Popper.js, then Bootstrap JS -->
@@ -48,23 +68,74 @@
         integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous">
     </script>
     <script>
-
         var url = $("#url");
         var cluster = $("#cluster");
         var _data = $("#data");
-        var btnSubmit = $("#btnGetData");
-        var pMsg = $("#pMsg");
+        var btnCluster = $("#btnCluster");
+        var btnGetData = $("#btnGetData");
+        var pMsg_get = $("#pMsg_get");
+        var pMsg_cluster = $("#pMsg_cluster");
+        var iLoad_get = $("#iLoad_get");
+        var iLoad_cluster = $("#iLoad_cluster");
+        var showDataCluster = $("#showDataCluster");
         var _result;
-        
-        $(btnGetData).click(()=> {
-            data = {'url' : url.val(),'cluster' : cluster.val()}
-            fetchDataSearch('/data_mining/cau_1/data_post',data).then((result)=>{
 
-                _result = result
-                pMsg.html("Lay Du Lieu Thanh Cong")
 
-            })
+        btnCluster.click(function(e) {
+            data = {
+                "docCollection": _result,
+                "cluster": cluster.val()
+            }
+            iLoad_cluster.css('display', 'block');
+            pMsg_cluster.css('display', 'none');
+            fetchDataSearch('/data_mining/cau_1/cluster_post', data)
+                .then((result) => {
+                    // console.log(result);
+                    pMsg_cluster.css('display', 'block');
+                    iLoad_cluster.css('display', 'none');
+                    return result;
+                })
+                .then((data) => {
+                    let html = '';
+                    for (var i in data) {
+                        let nu = parseInt(i) + 1;
+                        html +=
+                            `<h4 class="text-center">--------------------------------cluster ${nu}---------------------------------</h4>`
+                        data[i].GroupedDocument.forEach(e => {
+                            for (let index = 0; index < 100; index++) {
+                                if (e[0] == _result[index].nd) {
+                                    if (_result[index].chuong !== undefined) {
+                                        html +=
+                                            ` <b><p style="font-size: 24px">${_result[index].chuong}</p></b>`
+                                    }
+                                    html += `
+                                                <p style="font-size: 18px">${_result[index].dieu}</p>
+                                                <p>${e[0]}</p>
+                                                <hr>
+                                    `
+                                }
+                            }
+                        })
+                    }
+                    showDataCluster.html(html);
+                })
+
         });
+
+        btnGetData.click(() => {
+            data = {
+                'url': url.val()
+            }
+            pMsg_get.css('display', 'none');
+            iLoad_get.css('display', 'block');
+            fetchDataSearch('/data_mining/cau_1/data_post', data)
+                .then((result) => {
+                    _result = result
+                    iLoad_get.css('display', 'none');
+                    pMsg_get.css('display', 'block');
+                })
+        });
+
 
         async function fetchDataSearch(url, data) {
             let token = document.querySelector('meta[name="csrf-token"]').getAttribute('content');

@@ -27,7 +27,7 @@ class MiningCau1Controller extends Controller
 
     public function index()
     {
-        $data = $this->getDataFromSourceWeb();
+        // $data = $this->getDataFromSourceWeb();
         // for ($i=0; $i < 100; $i++) { 
         //     $this->docCollection["DocumentList"][] = $data[$i]->nd;
         // }
@@ -35,21 +35,32 @@ class MiningCau1Controller extends Controller
         // $this->ProcessDocumentCollection($this->docCollection);
         // $result = $this->PrepareDocumentCluster(5, $this->space);
         // dd($result);
-        return view('mining.cau1_index',["data" => json_encode($data)]);
-
+        // return view('mining.cau1_index',["data" => json_encode($data)]);
+        return view('mining.cau1_index');
     }
-    public function data_post(Request $request){
+    public function data_post(Request $request)
+    {
 
-        $data = $this->getDataFromSourceWeb();
+        $data = $this->getDataFromSourceWeb($request->url);
         return json_encode($data);
     }
-    public function cluster_post(Request $request){
-        return $request->all();
-    }
+    public function cluster_post(Request $request)
+    {
 
-    public function getDataFromSourceWeb(){
+        for ($i = 0; $i < 20; $i++) {
+
+            $this->docCollection["DocumentList"][] =$request->docCollection[$i]['nd'];
+        }
+        $this->ProcessDocumentCollection($this->docCollection);
+        $result = $this->PrepareDocumentCluster($request->cluster, $this->space);
+     
+        return json_encode($result);
+     
+    }
+    public $accept;
+    public function getDataFromSourceWeb($url)
+    {
         $client = new Client();
-        $url = 'https://thuvienphapluat.vn/van-ban/Bat-dong-san/Luat-dat-dai-2013-215836.aspx';
         $page = $client->request('GET', $url);
         $page->filter('p')->each(function ($item) {
             $it = $item->text();
@@ -65,18 +76,38 @@ class MiningCau1Controller extends Controller
             }
         });
         $data = $this->results;
+
         $dataNew = [];
-        foreach ($data as $key => $items) {
-            foreach ($items as $key_ => $item) {
-                foreach ($item as $key__ => $it) {
-                    $arr = array("chuong" => $key, "dieu" => $key_, "nd" => $it);
-                    $obj = (object)$arr;
-                    $dataNew[] = $obj;
+        $this->accept = 0;
+        foreach ($this->results as $key => $value) {
+            if ((Str::contains($key, 'Chương') || Str::contains($key, 'CHƯƠNG'))) {
+                $this->accept = 1;
+                break;
+            }
+            break;
+        }
+
+        if ($this->accept == 1) {
+            foreach ($data as $key => $items) {
+                foreach ($items as $key_ => $item) {
+                    foreach ($item as $key__ => $it) {
+                        $arr = array("chuong" => $key, "dieu" => $key_, "nd" => $it);
+                        $obj = (object)$arr;
+                        $dataNew[] = $obj;
+                    }
+                }
+            }
+        }else{
+            foreach ($data as $key => $items) {
+                foreach ($items as $key_ => $item) {
+                        $arr = array("dieu" => $key, "nd" => $item);
+                        $obj = (object)$arr;
+                        $dataNew[] = $obj;
                 }
             }
         }
+      
         return $dataNew;
-
     }
     public function PrepareDocumentCluster($k, $documentCollection)
     {
@@ -93,10 +124,10 @@ class MiningCau1Controller extends Controller
         foreach ($uniqRand as $k => $pos) {
             $centroidCollection[$k]["GroupedDocument"][] = $this->space[$pos];
         }
-     
+
         do {
             $prevClusterCenter = $centroidCollection;
-      
+
             // dd($this->docCollection);
 
             foreach ($this->space as $obj) {
@@ -114,7 +145,6 @@ class MiningCau1Controller extends Controller
             if (!$stoppingCriteria) {
                 $resultSet = [];
             }
-
         } while ($stoppingCriteria == false);
         return $resultSet;
     }
@@ -156,20 +186,16 @@ class MiningCau1Controller extends Controller
                 }
             } while ($index < count($newClusterCenter));
             // dd($changeIndex);
-            foreach ($changeIndex as $item){
+            foreach ($changeIndex as $item) {
 
-                if ($item != 0)
-                {
+                if ($item != 0) {
                     $stoppingCriteria = false;
                     return $stoppingCriteria;
-                }
-                else{
+                } else {
                     $stoppingCriteria = true;
-
                 }
             }
             return $stoppingCriteria;
-
         }
     }
     public function CalculateMeanPoints($_clusterCenter)
@@ -194,21 +220,21 @@ class MiningCau1Controller extends Controller
 
     public function GenerateRandomNumber($k, $docCount)
     {
-        $uniqRand = [0,1,2];
-        // if ($k > $docCount) {
+        $uniqRand = [];
+        if ($k > $docCount) {
 
-        //     do {
-        //         $pos = random_int(0, $docCount);
-        //         $uniqRand[] = $pos;
-        //     } while (count($uniqRand) != $docCount);
-        // } else {
-        //     do {
+            do {
+                $pos = random_int(0, $docCount);
+                $uniqRand[] = $pos;
+            } while (count($uniqRand) != $docCount);
+        } else {
+            do {
 
-        //         $pos = random_int(0, $docCount);
-        //         $uniqRand[] = $pos;
-        //     } while (count($uniqRand) != $k);
-        // }
-        // dd($uniqRand);
+                $pos = random_int(0, $docCount);
+                $uniqRand[] = $pos;
+            } while (count($uniqRand) != $k);
+        }
+      
         return $uniqRand;
     }
     public function ProcessDocumentCollection($collection)
@@ -274,14 +300,11 @@ class MiningCau1Controller extends Controller
         }
         $index = 0;
         $maxValue = $similarityMeasure[0];
-        for ($i = 0; $i < count($similarityMeasure); $i++)
-        {
+        for ($i = 0; $i < count($similarityMeasure); $i++) {
             //if document is similar assign the document to the lowest index cluster center to avoid the long loop
-            if ($similarityMeasure[$i] >$maxValue)
-            {
+            if ($similarityMeasure[$i] > $maxValue) {
                 $maxValue = $similarityMeasure[$i];
                 $index = $i;
-
             }
         }
         return $index;
