@@ -158,15 +158,10 @@ class LawController extends Controller
 
         // $data = json_encode($this->results);
         $data = $this->results;
-
         $dataNew = [];
-
         foreach ($data as $key => $items) {
-
             foreach ($items as $key_ => $item) {
-
                 foreach ($item as $key__ => $it) {
-
                     $arr = array("chuong" => $key, "dieu" => $key_, "nd" => $it);
                     $obj = (object)$arr;
                     $dataNew[] = $obj;

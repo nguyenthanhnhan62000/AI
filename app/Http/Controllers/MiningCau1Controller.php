@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use Goutte\Client;
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 
@@ -20,23 +21,62 @@ class MiningCau1Controller extends Controller
     public $space = [];
     public $space_guess = [];
     public $docCollection = [];
+    public $chapter = '';
+    public $child = '';
 
 
     public function index()
     {
+        $data = $this->getDataFromSourceWeb();
+        // for ($i=0; $i < 100; $i++) { 
+        //     $this->docCollection["DocumentList"][] = $data[$i]->nd;
+        // }
+        // // dd($this->docCollection["DocumentList"]);
+        // $this->ProcessDocumentCollection($this->docCollection);
+        // $result = $this->PrepareDocumentCluster(5, $this->space);
+        // dd($result);
+        return view('mining.cau1_index',["data" => json_encode($data)]);
 
-        $this->docCollection["DocumentList"][] = "HLV Park Hang Seo nói gì sau chiến thắng tưng bừng trước Pakistan?";
-        $this->docCollection["DocumentList"][] = "HLV Park Hang-seo 'mất niềm tin', tiết lộ về 2 pha hỏng ăn penalty liên tiếp của Công Phượng";
-        $this->docCollection["DocumentList"][] = "Xả súng kinh hoàng tại Điện Biên khiến 2 vợ chồng tử vong";
-        $this->docCollection["DocumentList"][] = "Nghi án nổ súng ở Điện Biên, hai vợ chồng tử vong tại chỗ";
-        $this->docCollection["DocumentList"][] = "Sập cầu ở Ý, 35 người thiệt mạng";
-        $this->docCollection["DocumentList"][] = "Công Phượng đá hỏng 2 quả penalty, bố mẹ ở nhà nghĩ gì?";
+    }
+    public function data_post(Request $request){
 
-        $this->ProcessDocumentCollection($this->docCollection);
+        $data = $this->getDataFromSourceWeb();
+        return json_encode($data);
+    }
+    public function cluster_post(Request $request){
+        return $request->all();
+    }
 
+    public function getDataFromSourceWeb(){
+        $client = new Client();
+        $url = 'https://thuvienphapluat.vn/van-ban/Bat-dong-san/Luat-dat-dai-2013-215836.aspx';
+        $page = $client->request('GET', $url);
+        $page->filter('p')->each(function ($item) {
+            $it = $item->text();
+            if ((Str::contains($it, 'Chương') || Str::contains($it, 'CHƯƠNG')) && (strpos($it, 'Chương') === 0 || strpos($it, 'CHƯƠNG') === 0)) {
+                $this->chapter = $it;
+                $this->child = '';
+            } else if ((Str::contains($it, 'Điều') && strpos($it, 'Điều') === 0) || (Str::contains($it, "“Điều"))) {
+                $this->child = $it;
+            } else if ($this->chapter !== '' && $this->child !== '') {
+                $this->results[$this->chapter][$this->child][] = $it;
+            } else if ($this->chapter === '' && $this->child !== '') {
+                $this->results[$this->child][] = $it;
+            }
+        });
+        $data = $this->results;
+        $dataNew = [];
+        foreach ($data as $key => $items) {
+            foreach ($items as $key_ => $item) {
+                foreach ($item as $key__ => $it) {
+                    $arr = array("chuong" => $key, "dieu" => $key_, "nd" => $it);
+                    $obj = (object)$arr;
+                    $dataNew[] = $obj;
+                }
+            }
+        }
+        return $dataNew;
 
-        $result = $this->PrepareDocumentCluster(3, $this->space);
-        dd($result);
     }
     public function PrepareDocumentCluster($k, $documentCollection)
     {

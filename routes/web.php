@@ -48,5 +48,7 @@ Route::post('/data_mining/index/post_test',[MiningController::class, 'post_test'
 
 
 Route::get('/data_mining/cau_1/index',[MiningCau1Controller::class, 'index']);
+Route::post('/data_mining/cau_1/cluster_post',[MiningCau1Controller::class, 'cluster_post']);
+Route::post('/data_mining/cau_1/data_post',[MiningCau1Controller::class, 'data_post']);
 
 
