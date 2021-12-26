@@ -7,7 +7,7 @@ use Illuminate\Http\Request;
 
 class MiningCau1Controller extends Controller
 {
-    
+
     public $array;
     public $arrayInput;
     public $results = [];
@@ -22,7 +22,8 @@ class MiningCau1Controller extends Controller
     public $docCollection = [];
 
 
-    public function index(){
+    public function index()
+    {
 
         $this->docCollection["DocumentList"][] = "HLV Park Hang Seo nói gì sau chiến thắng tưng bừng trước Pakistan?";
         $this->docCollection["DocumentList"][] = "HLV Park Hang-seo 'mất niềm tin', tiết lộ về 2 pha hỏng ăn penalty liên tiếp của Công Phượng";
@@ -30,49 +31,150 @@ class MiningCau1Controller extends Controller
         $this->docCollection["DocumentList"][] = "Nghi án nổ súng ở Điện Biên, hai vợ chồng tử vong tại chỗ";
         $this->docCollection["DocumentList"][] = "Sập cầu ở Ý, 35 người thiệt mạng";
         $this->docCollection["DocumentList"][] = "Công Phượng đá hỏng 2 quả penalty, bố mẹ ở nhà nghĩ gì?";
-        
+
         $this->ProcessDocumentCollection($this->docCollection);
 
-        $this->PrepareDocumentCluster(2, $this->space);
 
-        
+        $result = $this->PrepareDocumentCluster(3, $this->space);
+        dd($result);
     }
-    public function PrepareDocumentCluster($k, $documentCollection){
+    public function PrepareDocumentCluster($k, $documentCollection)
+    {
+
         $globalCounter = 0;
         $centroidCollection = [];
         $uniqRand = [];
+        $stoppingCriteria = true;
+        $resultSet = [];
+        $prevClusterCenter = [];
 
-        $uniqRand = $this->GenerateRandomNumber($k,count($documentCollection)-1);
+        $uniqRand = $this->GenerateRandomNumber($k, count($documentCollection));
 
-
-        foreach ($uniqRand as $pos) {
-            $centroidCollection["GroupedDocument"][] = $this->docCollection["DocumentList"][$pos];
+        foreach ($uniqRand as $k => $pos) {
+            $centroidCollection[$k]["GroupedDocument"][] = $this->space[$pos];
         }
-        dd($centroidCollection);
-        
+     
+        do {
+            $prevClusterCenter = $centroidCollection;
+      
+            // dd($this->docCollection);
 
+            foreach ($this->space as $obj) {
+                $index = $this->FindClosestClusterCenter($centroidCollection, $obj);
+                // echo (string)$index . '<br>';
+                $resultSet[$index]['GroupedDocument'][] = $obj;
+            }
+
+            $centroidCollection = [];
+
+            $centroidCollection = $this->CalculateMeanPoints($resultSet);
+
+            $stoppingCriteria = $this->CheckStoppingCriteria($prevClusterCenter, $centroidCollection);
+
+            if (!$stoppingCriteria) {
+                $resultSet = [];
+            }
+
+        } while ($stoppingCriteria == false);
+        return $resultSet;
     }
-    public function GenerateRandomNumber($k,$docCount){
-        $uniqRand = [];
-        if ($k > $docCount){
+    public $globalCounter = 0;
+    public function CheckStoppingCriteria($prevClusterCenter, $newClusterCenter)
+    {
+        $this->globalCounter++;
+        $counter = $this->globalCounter;
+        if ($this->globalCounter > 11000) {
+            return true;
+        } else {
 
+            $stoppingCriteria = true;
+            $changeIndex = [];
+            $index = 0;
             do {
-                $pos = random_int(0,$docCount);
-                $uniqRand[] = $pos;
-            } while (count($uniqRand) != $docCount);
+                $count = 0;
 
-        }else{
-            do {
+                if (count($newClusterCenter[$index]["GroupedDocument"]) == 0 && count($prevClusterCenter[$index]["GroupedDocument"]) == 0) {
 
-                $pos = random_int(0,$docCount);
-                $uniqRand[] = $pos;
-            } while (count($uniqRand) != $k);
+                    $index++;
+                } else if (count($newClusterCenter[$index]["GroupedDocument"]) != 0 && count($prevClusterCenter[$index]["GroupedDocument"]) != 0) {
+
+                    for ($j = 0; $j < count($newClusterCenter[$index]["GroupedDocument"][0][1]); $j++) {
+
+                        if ($newClusterCenter[$index]["GroupedDocument"][0][1][$j] == $prevClusterCenter[$index]["GroupedDocument"][0][1][$j]); {
+                            $count++;
+                        }
+                    }
+                    if ($count == count($newClusterCenter[$index]["GroupedDocument"][0][1])) {
+                        $changeIndex[$index] = 0;
+                    } else {
+                        $changeIndex[$index] = 1;
+                    }
+                    $index++;
+                } else {
+                    $index++;
+                    continue;
+                }
+            } while ($index < count($newClusterCenter));
+            // dd($changeIndex);
+            foreach ($changeIndex as $item){
+
+                if ($item != 0)
+                {
+                    $stoppingCriteria = false;
+                    return $stoppingCriteria;
+                }
+                else{
+                    $stoppingCriteria = true;
+
+                }
+            }
+            return $stoppingCriteria;
+
         }
+    }
+    public function CalculateMeanPoints($_clusterCenter)
+    {
+
+        for ($i = 0; $i < count($_clusterCenter); $i++) {
+
+            if (count($_clusterCenter[$i]["GroupedDocument"]) > 0) {
+                for ($j = 0; $j < count($_clusterCenter[$i]["GroupedDocument"][0][1]); $j++) {
+                    $total = 0;
+
+                    foreach ($_clusterCenter[$i]["GroupedDocument"] as $vSpace) {
+
+                        $total += (float)$vSpace[1][$j];
+                    }
+                    $_clusterCenter[$i]["GroupedDocument"][0][1][$j] = $total / count($_clusterCenter[$i]["GroupedDocument"]);
+                }
+            }
+        }
+        return $_clusterCenter;
+    }
+
+    public function GenerateRandomNumber($k, $docCount)
+    {
+        $uniqRand = [0,1,2];
+        // if ($k > $docCount) {
+
+        //     do {
+        //         $pos = random_int(0, $docCount);
+        //         $uniqRand[] = $pos;
+        //     } while (count($uniqRand) != $docCount);
+        // } else {
+        //     do {
+
+        //         $pos = random_int(0, $docCount);
+        //         $uniqRand[] = $pos;
+        //     } while (count($uniqRand) != $k);
+        // }
+        // dd($uniqRand);
         return $uniqRand;
     }
-    public function ProcessDocumentCollection($collection){
-        
-        foreach($collection["DocumentList"] as $documentContent){
+    public function ProcessDocumentCollection($collection)
+    {
+
+        foreach ($collection["DocumentList"] as $documentContent) {
             $it = explode(" ", $documentContent);
             foreach ($it as $value) {
                 $this->distinctTerms[] = $value;
@@ -80,11 +182,13 @@ class MiningCau1Controller extends Controller
         }
         $this->distinctTerms = array_unique($this->distinctTerms);
         foreach ($collection["DocumentList"] as $k =>  $document) {
+
+            $this->array = [];
             foreach ($this->distinctTerms as $key => $term) {
-                $this->space[$k][] = $this->FindTFIDF($document, $term);
+                $this->array[] = $this->FindTFIDF($document, $term);
             }
+            $this->space[$k] = [$this->docCollection["DocumentList"][$k], $this->array];
         }
-        // dd($this->space);
     }
 
 
@@ -120,16 +224,27 @@ class MiningCau1Controller extends Controller
         }
         return (float)log((float)$count / (1 + (float)count($this->docCollection["DocumentList"])));
     }
-    public function FindClosestClusterCenter($cluster, $obj)
+    public function FindClosestClusterCenter($clusterCenter, $obj)
     {
         $similarityMeasure = [];
-        foreach ($cluster as $key =>  $item) {
 
-            $similarityMeasure[] = $this->FindCosineSimilarity($item, $obj);
+        foreach ($clusterCenter as $key =>  $item) {
+
+            $similarityMeasure[] = $this->FindCosineSimilarity($item["GroupedDocument"][0][1], $obj[1]);
         }
+        $index = 0;
+        $maxValue = $similarityMeasure[0];
+        for ($i = 0; $i < count($similarityMeasure); $i++)
+        {
+            //if document is similar assign the document to the lowest index cluster center to avoid the long loop
+            if ($similarityMeasure[$i] >$maxValue)
+            {
+                $maxValue = $similarityMeasure[$i];
+                $index = $i;
 
-        return $similarityMeasure;
-
+            }
+        }
+        return $index;
     }
     public function FindCosineSimilarity($vecA, $vecB)
     {
@@ -158,5 +273,4 @@ class MiningCau1Controller extends Controller
 
         return (float)Sqrt($this->DotProduct($vector, $vector));
     }
-    
 }
