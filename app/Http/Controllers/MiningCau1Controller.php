@@ -27,15 +27,6 @@ class MiningCau1Controller extends Controller
 
     public function index()
     {
-        // $data = $this->getDataFromSourceWeb();
-        // for ($i=0; $i < 100; $i++) { 
-        //     $this->docCollection["DocumentList"][] = $data[$i]->nd;
-        // }
-        // // dd($this->docCollection["DocumentList"]);
-        // $this->ProcessDocumentCollection($this->docCollection);
-        // $result = $this->PrepareDocumentCluster(5, $this->space);
-        // dd($result);
-        // return view('mining.cau1_index',["data" => json_encode($data)]);
         return view('mining.cau1_index');
     }
 
@@ -68,7 +59,7 @@ class MiningCau1Controller extends Controller
     public function cluster_post(Request $request)
     {
 
-        for ($i = 0; $i < 20; $i++) {
+        for ($i = 0; $i < 100; $i++) {
 
             $this->docCollection["DocumentList"][] = $request->docCollection[$i]['nd'];
         }
@@ -244,20 +235,22 @@ class MiningCau1Controller extends Controller
     public function GenerateRandomNumber($k, $docCount)
     {
         $uniqRand = [];
-        if ($k > $docCount) {
+        // if ($k > $docCount) {
 
-            do {
-                $pos = random_int(0, $docCount);
-                $uniqRand[] = $pos;
-            } while (count($uniqRand) != $docCount);
-        } else {
-            do {
+        //     do {
+        //         $pos = random_int(0, $docCount);
+        //         $uniqRand[] = $pos;
+        //     } while (count($uniqRand) != $docCount);
+        // } else {
+        //     do {
 
-                $pos = random_int(0, $docCount);
-                $uniqRand[] = $pos;
-            } while (count($uniqRand) != $k);
+        //         $pos = random_int(0, $docCount);
+        //         $uniqRand[] = $pos;
+        //     } while (count($uniqRand) != $k);
+        // }
+        for ($i=0; $i < $k; $i++) { 
+            $uniqRand[] = $i;
         }
-
         return $uniqRand;
     }
     public function ProcessDocumentCollection($collection)
