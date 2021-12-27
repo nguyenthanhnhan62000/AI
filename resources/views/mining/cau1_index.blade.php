@@ -59,10 +59,7 @@
 
     </div>
     <div class="container mt-4" id="showDataCluster">
-        <h4 class="text-center">--------------------------------cluster 1---------------------------------</h4>
-        <p>Chương Cộng Hòa Xã Hội Chủ Nghĩa Việt Nam</p>
-        <p>Chương Cộng Hòa Xã Hội Chủ Nghĩa Việt Nam</p>
-        <p>Chương Cộng Hòa Xã Hội Chủ Nghĩa Việt Nam</p>
+
     </div>
 
 
@@ -94,6 +91,9 @@
         var mAmountSearch = $("#mAmountSearch");
         var _result;
         var _resultCluster;
+        var space;
+        var array;
+        var docCollection;
 
 
 
@@ -101,30 +101,56 @@
             let searchText = iSearch.val();
             let html = ''
             let i = 0;
-            for (const k in _resultCluster) {
-                html +=
-                    `<h4 class="text-center">--------------------------------cluster ${parseInt(k)+1}---------------------------------</h4>`
-                _resultCluster[k].GroupedDocument.forEach(e => {
-                    if (e[0].indexOf(searchText) !== -1) {
+            let data = {
+                "space": space,
+                "guess_test": searchText,
+                "array": array,
+                "docCollection": docCollection
+            };
+            fetchDataSearch('/data_mining/cau_1/search', data).then((re) => {
+
+                for (const key in re) {
+                    var index = re[key][0]
+                    if (re[key][1] !== 0) {
                         i++;
-                        for (let index = 0; index < 100; index++) {
-                            if (e[0] == _result[index].nd) {
-                                if (_result[index].chuong !== undefined) {
-                                    html +=
-                                        ` <b><p style="font-size: 24px">${_result[index].chuong}</p></b>`
-                                }
-                                html += `
-                                            <p style="font-size: 18px">${_result[index].dieu}</p>
-                                            <p>${e[0]}</p>
-                                            <hr>
-                                    `
-                            }
+                        if (_result[index].chuong !== undefined) {
+                            html += ` <b><p style="font-size: 24px">${_result[index].chuong}</p></b>`
                         }
+                        html += `
+                                    <p style="font-size: 18px">${_result[index].dieu}</p>
+                                    <p>${_result[index].nd}</p>
+                                    <hr>
+                        `
                     }
-                });
-            }
-            showDataCluster.html(html);
-            mAmountSearch.html(i);
+                }
+                showDataCluster.html(html);
+                mAmountSearch.html(i);
+            })
+
+            // for (const k in _resultCluster) {
+            //     html +=
+            //         `<h4 class="text-center">--------------------------------cluster ${parseInt(k)+1}---------------------------------</h4>`
+            //     _resultCluster[k].GroupedDocument.forEach(e => {
+            //         if (e[0].indexOf(searchText) !== -1) {
+            //             i++;
+            //             for (let index = 0; index < 100; index++) {
+            //                 if (e[0] == _result[index].nd) {
+            //                     if (_result[index].chuong !== undefined) {
+            //                         html +=
+            //                             ` <b><p style="font-size: 24px">${_result[index].chuong}</p></b>`
+            //                     }
+            //                     html += `
+        //                                 <p style="font-size: 18px">${_result[index].dieu}</p>
+        //                                 <p>${e[0]}</p>
+        //                                 <hr>
+        //                         `
+            //                 }
+            //             }
+            //         }
+            //     });
+            // }
+            // showDataCluster.html(html);
+            // mAmountSearch.html(i);
         });
         btnCluster.click(function(e) {
             data = {
@@ -134,12 +160,15 @@
             iLoad_cluster.css('display', 'block');
             pMsg_cluster.css('display', 'none');
             fetchDataSearch('/data_mining/cau_1/cluster_post', data)
-                .then((result) => {
+                .then((results) => {
                     // console.log(result);
-                    _resultCluster = result;
+                    _resultCluster = results.result;
+                    space = results.space;
+                    array = results.array;
+                    docCollection = results.docCollection;
                     pMsg_cluster.css('display', 'block');
                     iLoad_cluster.css('display', 'none');
-                    return result;
+                    return results.result;
                 })
                 .then((data) => {
                     let html = '';

@@ -47,6 +47,7 @@ class MiningController extends Controller
         $space = json_decode($request->space);
         $this->arrayInput = json_decode($request->arrayInput);
 
+
         foreach ($array as  $item) {
             $this->space_guess[0][] = $this->FindTFIDF($request->guess_test, $item);
         }

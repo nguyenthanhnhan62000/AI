@@ -39,6 +39,26 @@ class MiningCau1Controller extends Controller
         return view('mining.cau1_index');
     }
 
+    public function search(Request $request)
+    {
+
+        $array = $request->array;
+        $this->docCollection = $request->docCollection;
+        // $array = (array)$array;
+        $space = $request->space;
+        foreach ($array as  $item) {
+            $this->space_guess[0][] = $this->FindTFIDF($request->guess_test, $item);
+        }
+        $arr = $this->_FindClosestClusterCenter($space, $this->space_guess[0]);
+
+        arsort($arr);
+        $arr_num = [];
+        foreach ($arr as $key => $value) {
+            $arr_num[] = [$key,$value];
+        }
+        return json_encode($arr_num);
+    }
+
     public function data_post(Request $request)
     {
 
@@ -48,15 +68,17 @@ class MiningCau1Controller extends Controller
     public function cluster_post(Request $request)
     {
 
-        for ($i = 0; $i < 50; $i++) {
+        for ($i = 0; $i < 20; $i++) {
 
-            $this->docCollection["DocumentList"][] =$request->docCollection[$i]['nd'];
+            $this->docCollection["DocumentList"][] = $request->docCollection[$i]['nd'];
         }
         $this->ProcessDocumentCollection($this->docCollection);
+
         $result = $this->PrepareDocumentCluster($request->cluster, $this->space);
-     
-        return json_encode($result);
-     
+
+        return json_encode(["result" => $result, "space" => $this->space, "array" => $this->distinctTerms, "docCollection" => $this->docCollection]);
+        // return json_encode($result);
+
     }
     public $accept;
     public function getDataFromSourceWeb($url)
@@ -98,16 +120,16 @@ class MiningCau1Controller extends Controller
                     }
                 }
             }
-        }else{
+        } else {
             foreach ($data as $key => $items) {
                 foreach ($items as $key_ => $item) {
-                        $arr = array("dieu" => $key, "nd" => $item);
-                        $obj = (object)$arr;
-                        $dataNew[] = $obj;
+                    $arr = array("dieu" => $key, "nd" => $item);
+                    $obj = (object)$arr;
+                    $dataNew[] = $obj;
                 }
             }
         }
-      
+
         return $dataNew;
     }
     public function PrepareDocumentCluster($k, $documentCollection)
@@ -235,7 +257,7 @@ class MiningCau1Controller extends Controller
                 $uniqRand[] = $pos;
             } while (count($uniqRand) != $k);
         }
-      
+
         return $uniqRand;
     }
     public function ProcessDocumentCollection($collection)
@@ -294,9 +316,7 @@ class MiningCau1Controller extends Controller
     public function FindClosestClusterCenter($clusterCenter, $obj)
     {
         $similarityMeasure = [];
-
         foreach ($clusterCenter as $key =>  $item) {
-
             $similarityMeasure[] = $this->FindCosineSimilarity($item["GroupedDocument"][0][1], $obj[1]);
         }
         $index = 0;
@@ -310,6 +330,17 @@ class MiningCau1Controller extends Controller
         }
         return $index;
     }
+    public function _FindClosestClusterCenter($clusterCenter, $obj)
+    {
+        $similarityMeasure = [];
+        foreach ($clusterCenter as $key =>  $item) {
+
+            $similarityMeasure[] = $this->FindCosineSimilarity($item[1], $obj);
+        }
+
+        return $similarityMeasure;
+    }
+
     public function FindCosineSimilarity($vecA, $vecB)
     {
         $dotProduct = $this->DotProduct($vecA, $vecB);
