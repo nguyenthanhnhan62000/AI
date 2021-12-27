@@ -38,6 +38,7 @@ class MiningCau1Controller extends Controller
         // return view('mining.cau1_index',["data" => json_encode($data)]);
         return view('mining.cau1_index');
     }
+
     public function data_post(Request $request)
     {
 
@@ -47,7 +48,7 @@ class MiningCau1Controller extends Controller
     public function cluster_post(Request $request)
     {
 
-        for ($i = 0; $i < 20; $i++) {
+        for ($i = 0; $i < 50; $i++) {
 
             $this->docCollection["DocumentList"][] =$request->docCollection[$i]['nd'];
         }

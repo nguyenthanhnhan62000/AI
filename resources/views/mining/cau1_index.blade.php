@@ -16,11 +16,11 @@
 <body>
     <div class="container mt-4">
         <div class="row">
-            <div class="col-md-7">
+            <div class="col-md-6">
                 <div class="form-group">
                     <label><b>Nhap URL De Phan Cum Van Ban</b> </label>
-                    <input type="text" id="url" class="form-control" placeholder="..."
-                        value="https://thuvienphapluat.vn/van-ban/Bat-dong-san/Luat-dat-dai-2013-215836.aspx">
+                    <textarea height="100px" type="text" id="url" class="form-control"
+                        placeholder="...">https://thuvienphapluat.vn/van-ban/Bat-dong-san/Luat-dat-dai-2013-215836.aspx</textarea>
                     {{-- <input type="text" id="data" hidden class="form-control" {{ $data }}> <br> --}} <br>
                     <button type="button" id="btnGetData" class="btn btn-primary">Lay Du Lieu</button>
                     <img src="{{ asset('img/gif.gif') }}" width="100px" id="iLoad_get" style="display:none">
@@ -31,7 +31,7 @@
 
                 </div>
             </div>
-            <div class="col-md-5">
+            <div class="col-md-3">
                 <div class="form-group">
                     <label for="">Nhap So Cum</label>
                     <input type="text" id="cluster" class="form-control" placeholder="" value="2"> <br>
@@ -44,7 +44,18 @@
 
                 </div>
             </div>
+            <div class="col-md-3">
+                <div class="form-group">
+                    <label for="">Tim Kiem</label>
+                    <input type="text" class="form-control" id="iSearch" value="đất đai"> <br>
+                    <button class="btn btn-info" id="bSearch">Tim Kiem</button>
+                </div>
+            </div>
         </div>
+
+    </div>
+    <div class="container">
+        <em>số kết quả tìm kiếm được <mark id="mAmountSearch">0</mark></em>
 
     </div>
     <div class="container mt-4" id="showDataCluster">
@@ -78,9 +89,43 @@
         var iLoad_get = $("#iLoad_get");
         var iLoad_cluster = $("#iLoad_cluster");
         var showDataCluster = $("#showDataCluster");
+        var bSearch = $("#bSearch");
+        var iSearch = $("#iSearch");
+        var mAmountSearch = $("#mAmountSearch");
         var _result;
+        var _resultCluster;
 
 
+
+        bSearch.click(function(e) {
+            let searchText = iSearch.val();
+            let html = ''
+            let i = 0;
+            for (const k in _resultCluster) {
+                html +=
+                    `<h4 class="text-center">--------------------------------cluster ${parseInt(k)+1}---------------------------------</h4>`
+                _resultCluster[k].GroupedDocument.forEach(e => {
+                    if (e[0].indexOf(searchText) !== -1) {
+                        i++;
+                        for (let index = 0; index < 100; index++) {
+                            if (e[0] == _result[index].nd) {
+                                if (_result[index].chuong !== undefined) {
+                                    html +=
+                                        ` <b><p style="font-size: 24px">${_result[index].chuong}</p></b>`
+                                }
+                                html += `
+                                            <p style="font-size: 18px">${_result[index].dieu}</p>
+                                            <p>${e[0]}</p>
+                                            <hr>
+                                    `
+                            }
+                        }
+                    }
+                });
+            }
+            showDataCluster.html(html);
+            mAmountSearch.html(i);
+        });
         btnCluster.click(function(e) {
             data = {
                 "docCollection": _result,
@@ -91,6 +136,7 @@
             fetchDataSearch('/data_mining/cau_1/cluster_post', data)
                 .then((result) => {
                     // console.log(result);
+                    _resultCluster = result;
                     pMsg_cluster.css('display', 'block');
                     iLoad_cluster.css('display', 'none');
                     return result;

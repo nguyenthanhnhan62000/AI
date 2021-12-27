@@ -38,6 +38,7 @@ Route::get('cau_3/search',[CertificatesLandController::class, 'search'])->name('
 
 
 //data mining
+//cau 2
 Route::get('/data_mining/data',[LawController::class, 'sendToDataMining']);
 Route::post('/data_mining/post_test',[LawController::class, 'post_test']);
 Route::get('/data_mining/test',[MiningController::class, 'test']);
@@ -46,9 +47,10 @@ Route::get('/data_mining/test_data_mining',[MiningController::class, 'test_data_
 Route::get('/data_mining/guess_mining',[MiningController::class, 'guess_mining']);
 Route::post('/data_mining/index/post_test',[MiningController::class, 'post_test']);
 
-
+//cau 1
 Route::get('/data_mining/cau_1/index',[MiningCau1Controller::class, 'index']);
 Route::post('/data_mining/cau_1/cluster_post',[MiningCau1Controller::class, 'cluster_post']);
 Route::post('/data_mining/cau_1/data_post',[MiningCau1Controller::class, 'data_post']);
+Route::post('/data_mining/cau_1/search',[MiningCau1Controller::class, 'search']);
 
 
