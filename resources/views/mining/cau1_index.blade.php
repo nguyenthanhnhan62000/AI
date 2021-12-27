@@ -55,7 +55,7 @@
 
     </div>
     <div class="container">
-        <em>số kết quả tìm kiếm được <mark id="mAmountSearch">0</mark></em>
+        <em style="display:none" id="eResultSearch">số kết quả tìm kiếm được <mark id="mAmountSearch">0</mark></em>
 
     </div>
     <div class="container mt-4" id="showDataCluster">
@@ -89,6 +89,7 @@
         var bSearch = $("#bSearch");
         var iSearch = $("#iSearch");
         var mAmountSearch = $("#mAmountSearch");
+        var eResultSearch = $("#eResultSearch");
         var _result;
         var _resultCluster;
         var space;
@@ -107,8 +108,9 @@
                 "array": array,
                 "docCollection": docCollection
             };
+           
             fetchDataSearch('/data_mining/cau_1/search', data).then((re) => {
-
+                
                 for (const key in re) {
                     var index = re[key][0]
                     if (re[key][1] !== 0) {
@@ -125,32 +127,8 @@
                 }
                 showDataCluster.html(html);
                 mAmountSearch.html(i);
+                eResultSearch.css('display', 'block')
             })
-
-            // for (const k in _resultCluster) {
-            //     html +=
-            //         `<h4 class="text-center">--------------------------------cluster ${parseInt(k)+1}---------------------------------</h4>`
-            //     _resultCluster[k].GroupedDocument.forEach(e => {
-            //         if (e[0].indexOf(searchText) !== -1) {
-            //             i++;
-            //             for (let index = 0; index < 100; index++) {
-            //                 if (e[0] == _result[index].nd) {
-            //                     if (_result[index].chuong !== undefined) {
-            //                         html +=
-            //                             ` <b><p style="font-size: 24px">${_result[index].chuong}</p></b>`
-            //                     }
-            //                     html += `
-        //                                 <p style="font-size: 18px">${_result[index].dieu}</p>
-        //                                 <p>${e[0]}</p>
-        //                                 <hr>
-        //                         `
-            //                 }
-            //             }
-            //         }
-            //     });
-            // }
-            // showDataCluster.html(html);
-            // mAmountSearch.html(i);
         });
         btnCluster.click(function(e) {
             data = {
@@ -159,6 +137,7 @@
             }
             iLoad_cluster.css('display', 'block');
             pMsg_cluster.css('display', 'none');
+            eResultSearch.css('display', 'none')
             fetchDataSearch('/data_mining/cau_1/cluster_post', data)
                 .then((results) => {
                     // console.log(result);
@@ -203,6 +182,7 @@
             }
             pMsg_get.css('display', 'none');
             iLoad_get.css('display', 'block');
+            eResultSearch.css('display', 'none')
             fetchDataSearch('/data_mining/cau_1/data_post', data)
                 .then((result) => {
                     _result = result
