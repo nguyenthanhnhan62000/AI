@@ -108,12 +108,12 @@
                 "array": array,
                 "docCollection": docCollection
             };
-           
             fetchDataSearch('/data_mining/cau_1/search', data).then((re) => {
-                
+
                 for (const key in re) {
                     var index = re[key][0]
                     if (re[key][1] !== 0) {
+
                         i++;
                         if (_result[index].chuong !== undefined) {
                             html += ` <b><p style="font-size: 24px">${_result[index].chuong}</p></b>`
@@ -121,10 +121,21 @@
                         html += `
                                     <p style="font-size: 18px">${_result[index].dieu}</p>
                                     <p>${_result[index].nd}</p>
-                                    <hr>
+                                    
                         `
+                        for (const key in _resultCluster) {
+                            _resultCluster[key]["GroupedDocument"].forEach((e) => {
+                                if (e[0] === _result[index].nd) {
+                                    html += `<p>Cluster ${key}</P> 
+                                             <hr>    
+                                    `
+                                }
+                            })
+                        }
+
                     }
                 }
+
                 showDataCluster.html(html);
                 mAmountSearch.html(i);
                 eResultSearch.css('display', 'block')
