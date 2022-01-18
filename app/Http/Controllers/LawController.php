@@ -19,10 +19,10 @@ class LawController extends Controller
     public $chapter = '';
     public $child = '';
     public $index;
+    public $amount = [];
     public function index()
     {
-        // $it = 'Điều 1. Điều 126 của Luật nhà ở được sửa đổi, bổ sung như sau:';
-        // dd(stripos($it, 'Điều'));
+
         return view('law.index');
     }
     public function post_index(Request $request)
@@ -56,9 +56,14 @@ class LawController extends Controller
                 });
             });
         });
+
+        $page->filter('.info-red')->each(function ($item) {
+            $this->amount[] = $item->text();
+        });
+
         $data = $this->results;
 
-        return response()->json(['data' => $data]);
+        return response()->json(['data' => $data,'amount' => $this->amount]);
     }
 
     public function crawl_content($path)

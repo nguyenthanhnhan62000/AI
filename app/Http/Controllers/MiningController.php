@@ -28,20 +28,7 @@ class MiningController extends Controller
     }
     public function post_test(Request $request){
 
-        // $this->guess_mining();
-        // foreach ($this->arrayInput as $key => $item) {
-        //     $it = explode(" ", $item);
-        //     foreach ($it as $value) {
-        //         $this->arrText[] = $value;
-        //     }
-        // }
-        // $this->array = array_unique($this->arrText);
-        // // dd($this->array);
-        // foreach ($this->arrayInput as $k =>  $items) {
-        //     foreach ($this->array as $key => $item) {
-        //         $this->space[$k][] = $this->FindTFIDF($items, $item);
-        //     }
-        // }
+
         $array = json_decode($request->array);
         $array = (array)$array;
         $space = json_decode($request->space);
@@ -74,8 +61,6 @@ class MiningController extends Controller
         }
         return view('mining.index',['array' =>json_encode($this->array),'space'=>json_encode($this->space),'arrayInput' => json_encode($this->arrayInput)]);
 
-        
-        // return view('mining.index',["data" => $this->arrayInput,'space'=>$this->space]);
     }
     public function test()
     {
@@ -232,7 +217,7 @@ class MiningController extends Controller
                 $_url = $item->attr('href');
                 $client = new Client();
                 $_page = $client->request('GET', $_url);
-                if ($this->index < 2) {
+                if ($this->index < 1) {
                     $this->text = $this->text . $_page->filter('.fck_detail')->text();
                 }
                 $this->index++;

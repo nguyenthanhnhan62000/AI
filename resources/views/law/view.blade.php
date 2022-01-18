@@ -34,15 +34,8 @@
         </div>
         <hr>
     </div>
-    <div class="container showDataSearch" style="overflow:auto;height: 400px;">
-        <div class="">
-            <h5>Chương 1.</h5>
-            <h6>Điều 1. phạm vi điều chỉnh</h6>
-            <p>luật này quy định về chế độ sở hữu đất đai, quyền hạn và trách nhiệm của nhà nước đại diện chủ sở hữu
-                toàn dân về đất đai và thống nhất quản lý về đất đai, chế độ quản lý và sử dụng đất đai, quyền và nghĩa
-                vụ của người sử dụng đất đối với đất đai thuộc lãnh thổ của nước cộng hòa xã hội chủ nghĩa việt nam
-            </p>
-        </div>
+    <div class="container showDataSearch" style="overflow:auto;">
+     
 
     </div>
     <div class="container showContent1">
@@ -154,6 +147,7 @@
             console.log(data);
             amount_search.html(arrSearch.length);
             showDataSearch.html(htmlResultSearch)
+            showDataSearch.css('height','400px')
             //end show result search to view
 
         });

@@ -27,6 +27,9 @@
             <li class="nav-item">
                 <a href="/search" class="nav-link">Tìm kiếm giá đất</a>
             </li>
+            <li class="nav-item">
+                <a href="/cau_3/search" class="nav-link">Các loại giấy tờ liên quan đến sổ đỏ</a>
+            </li>
         </ul>
     </div>
     <div class="mt-4">

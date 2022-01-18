@@ -56,6 +56,7 @@
     </div>
     <div class="container">
         <em style="display:none" id="eResultSearch">số kết quả tìm kiếm được <mark id="mAmountSearch">0</mark></em>
+        <em style="display:none" id="eAmountCluster"></em>
 
     </div>
     <div class="container mt-4" id="showDataCluster">
@@ -90,6 +91,7 @@
         var iSearch = $("#iSearch");
         var mAmountSearch = $("#mAmountSearch");
         var eResultSearch = $("#eResultSearch");
+        var eAmountCluster = $("#eAmountCluster");
         var _result;
         var _resultCluster;
         var space;
@@ -114,7 +116,7 @@
                     var index = re[key][0]
                     if (re[key][1] !== 0) {
 
-                        i++;
+                        i++;    
                         if (_result[index].chuong !== undefined) {
                             html += ` <b><p style="font-size: 24px">${_result[index].chuong}</p></b>`
                         }
@@ -139,6 +141,7 @@
                 showDataCluster.html(html);
                 mAmountSearch.html(i);
                 eResultSearch.css('display', 'block')
+                eAmountCluster.css('display', 'none');
             })
         });
         btnCluster.click(function(e) {
@@ -157,13 +160,17 @@
                     array = results.array;
                     docCollection = results.docCollection;
                     pMsg_cluster.css('display', 'block');
+                    eAmountCluster.css('display', 'block');
                     iLoad_cluster.css('display', 'none');
                     return results.result;
                 })
                 .then((data) => {
+                    
                     let html = '';
+                    let amountCluster = ''
                     for (var i in data) {
                         let nu = parseInt(i) + 1;
+                        amountCluster += 'cluster ' + nu +' : '+ + data[i].GroupedDocument.length +'<br>';
                         html +=
                             `<h4 class="text-center">--------------------------------cluster ${nu}---------------------------------</h4>`
                         data[i].GroupedDocument.forEach(e => {
@@ -183,6 +190,7 @@
                         })
                     }
                     showDataCluster.html(html);
+                    eAmountCluster.html(amountCluster);
                 })
 
         });

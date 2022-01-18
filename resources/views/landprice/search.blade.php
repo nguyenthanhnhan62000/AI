@@ -221,7 +221,7 @@
                 body: urlencoded,
                 redirect: 'follow'
             };
-            return await fetch("https://corsanywhere.herokuapp.com/" + url, requestOptions)
+            return await fetch("https://intense-earth-62646.herokuapp.com/" + url, requestOptions)
                 .then(response => response.text())
                 .then((result) => {
                     let arr = []

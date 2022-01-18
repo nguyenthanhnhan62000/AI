@@ -14,34 +14,15 @@
         em {
             background: yellow;
         }
+        span {
+            color: red;
+        }
 
     </style>
 </head>
 
 <body>
-    {{-- <div class="container">
-        <table class="table">
-            <thead>
-                <tr>
-                    <th>#</th>
-                    <th>Name</th>
-                    <th></th>
-                </tr>
-            </thead>
-            <tbody>
-                @foreach ($laws as $law)
-                    
-                <tr>
-                    <td scope="row">{{ $law->id }}</td>
-                    <td>{{ $law->name }}</td>
-                    <td>
-                        <a href="law/{{ $law->id }}" class="btn btn-primary">View</a>
-                    </td>
-                </tr>
-                @endforeach
-            </tbody>
-        </table>
-    </div> --}}
+
     <hr>
     <div class="container">
         <div class="row">
@@ -58,7 +39,9 @@
             </div>
         </div>
     </div>
-    
+    <div class="container amountData">
+        Kết quả <span class="amount1"></span> trong <span class="amount2"></span> văn bản
+    </div>
     <div class="container showData">
         <div class="row">
 
@@ -79,6 +62,45 @@
         let searchLaw = $('.searchLaw');
         let btnSearchLaw = $('.btnSearchLaw');
         let showData = $('.showData');
+        let amount1 = $('.amount1');
+        let amount2 = $('.amount2');
+        test();
+
+        function test() {
+            let data = {
+            'textSearch': 'Luật đất đai',
+            'page': 1
+        }
+        let html = ''
+        fetchData('/law/post/index', data).then(function(result) {
+            data = result.data;
+            amount = result.amount;
+            for (let key in data) {
+                html += `
+                            <div class="row">
+                                <div class="col-md-1">${key}</div>
+                                <div class="col-md-7">
+                                    <form action="/law/post/show" method="post">
+                                        @csrf
+                                        <input type="hidden" name="path" value="${data[key][1]}">
+                                        <p><button type="submit" class="btn"><b>${data[key][0]}</b></button></p>
+                                    </form>
+                                    <p>${data[key][2]}</p>
+                                </div>
+                                <div class="col-md-4">
+                                    <div>${data[key][3]}</div>
+                                    <div>${data[key][4]}</div>
+                                    <div>${data[key][5]}</div>
+                                    <div>${data[key][6]}</div>
+                                </div>
+                            </div>       
+                    `
+            }
+            showData.html(html)
+            amount1.html(amount[0])
+            amount2.html(amount[1])
+        })
+        }
 
         btnSearchLaw.click(function() {
             let data = {
@@ -88,6 +110,7 @@
             let html = ''
             fetchData('/law/post/index', data).then(function(result) {
                 data = result.data;
+                amount = result.amount;
                 for (let key in data) {
                     html += `
                             <div class="row">
@@ -110,13 +133,17 @@
                     `
                 }
                 showData.html(html)
+                amount1.html(amount[0])
+                amount2.html(amount[1])
             })
         });
 
-        
+
         //redirect To View
-        function redirectToView(path){
-            fetchData('/law/post/show',{path : path}).then((result) => {
+        function redirectToView(path) {
+            fetchData('/law/post/show', {
+                path: path
+            }).then((result) => {
                 console.log(1);
             });
         }
@@ -140,6 +167,7 @@
                 });
         }
     </script>
+   
 </body>
 
 </html>
